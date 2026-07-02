@@ -1,12 +1,15 @@
 <?php
-
 namespace App\Entity;
-
 use App\Repository\RecipeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\RecipeLevel;
 use App\Enum\RecipeSeason;
-
+use App\Entity\RecipeIngredient;
+use App\Entity\RecipeCondiment;
+use App\Entity\Media;
+use App\Entity\RecipeShoppingList;
 
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
 class Recipe
@@ -25,12 +28,50 @@ class Recipe
     #[ORM\Column(enumType: RecipeSeason::class)]
     private ?RecipeSeason $season = null;
 
-
     #[ORM\Column(length: 255)]
     private ?string $time = null;
 
     #[ORM\Column(enumType: RecipeLevel::class)]
     private ?RecipeLevel $level = null;
+
+    /**
+     * @var Collection<int, RecipeIngredient>
+     */
+    #[ORM\OneToMany(targetEntity: RecipeIngredient::class, mappedBy: 'recipe', orphanRemoval: true)]
+    private Collection $recipeIngredients;
+
+    /**
+     * @var Collection<int, RecipeCondiment>
+     */
+    #[ORM\OneToMany(targetEntity: RecipeCondiment::class, mappedBy: 'recipe', orphanRemoval: true)]
+    private Collection $recipeCondiments;
+
+    /**
+     * @var Collection<int, RecipeShoppingList>
+     */
+    #[ORM\OneToMany(targetEntity: RecipeShoppingList::class, mappedBy: 'recipe', orphanRemoval: true)]
+    private Collection $recipeShoppingLists;
+     /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'recipe', orphanRemoval: true)]
+    private Collection $media;
+
+    /**
+     * @var Collection<int, ShoppingListSubstitute>
+     */
+    #[ORM\OneToMany(targetEntity: ShoppingListSubstitute::class, mappedBy: 'recipe', orphanRemoval: true)]
+    private Collection $shoppingListSubstitutes;
+
+
+    public function __construct()
+    {
+        $this->recipeIngredients = new ArrayCollection();
+        $this->recipeCondiments = new ArrayCollection();
+        $this->media = new ArrayCollection();
+        $this->recipeShoppingLists = new ArrayCollection();
+        $this->shoppingListSubstitutes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -40,7 +81,6 @@ class Recipe
     public function setId(int $id): static
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -52,7 +92,6 @@ class Recipe
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -64,7 +103,6 @@ class Recipe
     public function setStep(string $step): static
     {
         $this->step = $step;
-
         return $this;
     }
 
@@ -76,7 +114,6 @@ class Recipe
     public function setSeason(RecipeSeason $season): static
     {
         $this->season = $season;
-
         return $this;
     }
 
@@ -88,7 +125,6 @@ class Recipe
     public function setTime(string $time): static
     {
         $this->time = $time;
-
         return $this;
     }
 
@@ -96,9 +132,150 @@ class Recipe
     {
         return $this->level;
     }
+
     public function setLevel(RecipeLevel $level): static
     {
         $this->level = $level;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RecipeIngredient>
+     */
+    public function getRecipeIngredients(): Collection
+    {
+        return $this->recipeIngredients;
+    }
+
+    public function addRecipeIngredient(RecipeIngredient $recipeIngredient): static
+    {
+        if (!$this->recipeIngredients->contains($recipeIngredient)) {
+            $this->recipeIngredients->add($recipeIngredient);
+            $recipeIngredient->setRecipe($this);
+        }
+        return $this;
+    }
+
+    public function removeRecipeIngredient(RecipeIngredient $recipeIngredient): static
+    {
+        if ($this->recipeIngredients->removeElement($recipeIngredient)) {
+            if ($recipeIngredient->getRecipe() === $this) {
+                $recipeIngredient->setRecipe(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RecipeCondiment>
+     */
+    public function getRecipeCondiments(): Collection
+    {
+        return $this->recipeCondiments;
+    }
+
+    public function addRecipeCondiment(RecipeCondiment $recipeCondiment): static
+    {
+        if (!$this->recipeCondiments->contains($recipeCondiment)) {
+            $this->recipeCondiments->add($recipeCondiment);
+            $recipeCondiment->setRecipe($this);
+        }
+        return $this;
+    }
+
+    public function removeRecipeCondiment(RecipeCondiment $recipeCondiment): static
+    {
+        if ($this->recipeCondiments->removeElement($recipeCondiment)) {
+            if ($recipeCondiment->getRecipe() === $this) {
+                $recipeCondiment->setRecipe(null);
+            }
+        }
+        return $this;
+    }
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedia(Media $media): static
+    {
+        if (!$this->media->contains($media)) {
+            $this->media->add($media);
+            $media->setRecipe($this);
+        }
+        return $this;
+    }
+
+    public function removeMedia(Media $media): static
+    {
+        if ($this->media->removeElement($media)) {
+            if ($media->getRecipe() === $this) {
+                $media->setRecipe(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RecipeShoppingList>
+     */
+    public function getRecipeShoppingLists(): Collection
+    {
+        return $this->recipeShoppingLists;
+    }
+
+    public function addRecipeShoppingList(RecipeShoppingList $recipeShoppingList): static
+    {
+        if (!$this->recipeShoppingLists->contains($recipeShoppingList)) {
+            $this->recipeShoppingLists->add($recipeShoppingList);
+            $recipeShoppingList->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecipeShoppingList(RecipeShoppingList $recipeShoppingList): static
+    {
+        if ($this->recipeShoppingLists->removeElement($recipeShoppingList)) {
+            // set the owning side to null (unless already changed)
+            if ($recipeShoppingList->getRecipe() === $this) {
+                $recipeShoppingList->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ShoppingListSubstitute>
+     */
+    public function getShoppingListSubstitutes(): Collection
+    {
+        return $this->shoppingListSubstitutes;
+    }
+
+    public function addShoppingListSubstitute(ShoppingListSubstitute $shoppingListSubstitute): static
+    {
+        if (!$this->shoppingListSubstitutes->contains($shoppingListSubstitute)) {
+            $this->shoppingListSubstitutes->add($shoppingListSubstitute);
+            $shoppingListSubstitute->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShoppingListSubstitute(ShoppingListSubstitute $shoppingListSubstitute): static
+    {
+        if ($this->shoppingListSubstitutes->removeElement($shoppingListSubstitute)) {
+            // set the owning side to null (unless already changed)
+            if ($shoppingListSubstitute->getRecipe() === $this) {
+                $shoppingListSubstitute->setRecipe(null);
+            }
+        }
+
         return $this;
     }
 }
