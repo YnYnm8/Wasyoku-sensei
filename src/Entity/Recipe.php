@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Entity;
+
 use App\Repository\RecipeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +12,7 @@ use App\Entity\RecipeIngredient;
 use App\Entity\RecipeCondiment;
 use App\Entity\Media;
 use App\Entity\RecipeShoppingList;
+use App\Enum\RecipeMainCategory;
 
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
 class Recipe
@@ -34,6 +37,9 @@ class Recipe
     #[ORM\Column(enumType: RecipeLevel::class)]
     private ?RecipeLevel $level = null;
 
+    #[ORM\Column(enumType: RecipeMainCategory::class)]
+    private ?RecipeMainCategory $mainCategory = null;
+
     /**
      * @var Collection<int, RecipeIngredient>
      */
@@ -51,7 +57,7 @@ class Recipe
      */
     #[ORM\OneToMany(targetEntity: RecipeShoppingList::class, mappedBy: 'recipe', orphanRemoval: true)]
     private Collection $recipeShoppingLists;
-     /**
+    /**
      * @var Collection<int, Media>
      */
     #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'recipe', orphanRemoval: true)]
@@ -62,6 +68,8 @@ class Recipe
      */
     #[ORM\OneToMany(targetEntity: ShoppingListSubstitute::class, mappedBy: 'recipe', orphanRemoval: true)]
     private Collection $shoppingListSubstitutes;
+
+
 
 
     public function __construct()
@@ -276,6 +284,16 @@ class Recipe
             }
         }
 
+        return $this;
+    }
+
+    public function getMainCategory(): ?RecipeMainCategory
+    {
+        return $this->mainCategory;
+    }
+    public function setMainCategory(RecipeMainCategory $mainCategory): static
+    {
+        $this->mainCategory = $mainCategory;
         return $this;
     }
 }
