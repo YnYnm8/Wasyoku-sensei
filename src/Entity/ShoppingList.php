@@ -34,6 +34,10 @@ class ShoppingList
     #[ORM\OneToMany(targetEntity: ShoppingListSubstitute::class, mappedBy: 'shoppingList', orphanRemoval: true)]
     private Collection $shoppingListSubstitutes;
 
+    #[ORM\ManyToOne(inversedBy: 'shoppingLists')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -125,6 +129,18 @@ class ShoppingList
                 $shoppingListSubstitute->setShoppingList(null);
             }
         }
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
         return $this;
     }
 }

@@ -21,6 +21,11 @@ class Favorite
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $savedAt = null;
 
+
+    #[ORM\ManyToOne(inversedBy: 'favorites')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     // これは「カラムの代わり」ではなく、「カラムに自動で値を入れてくれる仕組み」です。
     public function __construct()
     {
@@ -59,6 +64,18 @@ class Favorite
     public function setSavedAt(\DateTimeImmutable $savedAt): static
     {
         $this->savedAt = $savedAt;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
         return $this;
     }
 }
