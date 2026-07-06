@@ -48,6 +48,12 @@ class Condiment
     #[ORM\OneToMany(targetEntity: ShoppingListSubstitute::class, mappedBy: 'condiment', orphanRemoval: true)]
     private Collection $shoppingListSubstitutes;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $url = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $imageUrl = null;
+
     public function __construct()
     {
         $this->recipeCondiments = new ArrayCollection();
@@ -206,6 +212,30 @@ class Condiment
                 $shoppingListSubstitute->setCondiment(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): static
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public function getImageUrl(): ?string
+    {
+        return $this->imageUrl;
+    }
+
+    public function setImageUrl(string $imageUrl): static
+    {
+        $this->imageUrl = $imageUrl;
 
         return $this;
     }
