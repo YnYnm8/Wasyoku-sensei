@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>難易度で探す</h1>
+
+  <ul>
+        {% for recipe in recipes %}
+            <li>
+                <a href="{{ path('app_recipe_show', {'id': recipe.id}) }}">
+                    {{ recipe.name }}
+                </a>
+                - {{ recipe.level.label }} - {{ recipe.time }}
+            </li>
+        {% else %}
+            <li>レシピが見つかりませんでした</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

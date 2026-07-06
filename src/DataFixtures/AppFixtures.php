@@ -34,7 +34,7 @@ class AppFixtures extends Fixture
         $manager->persist($gingembre);
 
         $oeuf = new Ingredient();
-        $oeuf->setName('Œufs');
+        $oeuf->setName('Oeufs');
         $manager->persist($oeuf);
 
         $Oignon = new Ingredient();
@@ -153,7 +153,7 @@ class AppFixtures extends Fixture
 
         $tamagoyaki = new Recipe();
         $tamagoyaki->setName('Tamagoyaki (Omelette japonaise)');
-        $tamagoyaki->setStep('1. Battre les œufs avec la sauce soja, le sucre et le sel. 2. Verser une fine couche dans une poêle chaude huilée. 3. Rouler l\'omelette au fur et à mesure de la cuisson en ajoutant de nouvelles couches. 4. Couper en tranches.');
+        $tamagoyaki->setStep('1. Battre les Oeufs avec la sauce soja, le sucre et le sel. 2. Verser une fine couche dans une poêle chaude huilée. 3. Rouler l\'omelette au fur et à mesure de la cuisson en ajoutant de nouvelles couches. 4. Couper en tranches.');
         $tamagoyaki->setSeason(RecipeSeason::ALL_YEAR);
         $tamagoyaki->setTime('10 min');
         $tamagoyaki->setLevel(RecipeLevel::EASY);
@@ -161,8 +161,8 @@ class AppFixtures extends Fixture
         $manager->persist($tamagoyaki);
 
         $oyakodon = new Recipe();
-        $oyakodon->setName('Oyakodon (Poulet et œuf sur riz)');
-        $oyakodon->setStep('1. Faire chauffer la sauce soja, le mirin, le saké et le sucre dans une poêle. 2. Ajouter le poulet et l\'oignon émincé, laisser mijoter. 3. Verser les œufs battus par-dessus et couvrir jusqu\'à cuisson désirée. 4. Servir sur un bol de riz chaud.');
+        $oyakodon->setName('Oyakodon (Poulet et Oeuf sur riz)');
+        $oyakodon->setStep('1. Faire chauffer la sauce soja, le mirin, le saké et le sucre dans une poêle. 2. Ajouter le poulet et l\'oignon émincé, laisser mijoter. 3. Verser les Oeufs battus par-dessus et couvrir jusqu\'à cuisson désirée. 4. Servir sur un bol de riz chaud.');
         $oyakodon->setSeason(RecipeSeason::ALL_YEAR);
         $oyakodon->setTime('20 min');
         $oyakodon->setLevel(RecipeLevel::MEDIUM);

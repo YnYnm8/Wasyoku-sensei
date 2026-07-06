@@ -15,7 +15,7 @@ enum RecipeMainCategory: string
         return match($this) {
             self::MEAT => 'Viande',
             self::FISH => 'Poisson',
-            self::EGG => 'Œuf',
+            self::EGG => 'Oeuf',
             self::TOFU => 'Tofu',
             self::VEGETABLE => 'Légumes',
         };
