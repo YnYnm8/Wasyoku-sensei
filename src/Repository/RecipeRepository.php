@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Repository;
+
 use App\Entity\Recipe;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -50,6 +52,39 @@ class RecipeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * お気に入りの登録数が多い順に、レシピを取得する
+     * ホームページの「人気のレシピ」に使用する
+     *
+     * @param int $limit 取得する件数（デフォルトは3件）
+     * @return Recipe[] 人気順に並んだ、レシピの配列
+     */
+    public function findMostPopular(int $limit = 3): array
+    {
+        return $this->createQueryBuilder('r')
+            // r（Recipe）から favorites（Favoriteとの関連）へ、橋渡しする
+            // leftJoin を使うのは、まだ1件もお気に入りされていないレシピも、
+            // 結果から消えずに表示されるようにするため
+            ->leftJoin('r.favorites', 'f')
+
+            // レシピのID（r.id）ごとに、まとめて集計できるようにする
+            // これが無いと、「レシピごとの、お気に入り件数」を数えられない
+            ->groupBy('r.id')
+
+            // COUNT(f.id) で、各レシピの「お気に入りの件数」を数え、
+            // DESC（多い順）で並び替える
+            ->orderBy('COUNT(f.id)', 'DESC')
+
+            // 上位、何件だけ取得するかを指定する（今回は3件）
+            ->setMaxResults($limit)
+
+            // ここまで組み立てた検索文を、実際に実行する
+            ->getQuery()
+
+            // 実行した結果を、配列として受け取る
+            ->getResult()
+        ;
+    }
     //    public function findOneBySomeField($value): ?Recipe
     //    {
     //        return $this->createQueryBuilder('r')

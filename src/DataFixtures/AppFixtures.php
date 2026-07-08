@@ -150,6 +150,7 @@ class AppFixtures extends Fixture
         $karaage->setLevel(RecipeLevel::EASY);
         $karaage->setMainCategory(RecipeMainCategory::MEAT);
         $manager->persist($karaage);
+        $this->addReference('recipe-karaage', $karaage);
 
         $tamagoyaki = new Recipe();
         $tamagoyaki->setName('Tamagoyaki (Omelette japonaise)');
@@ -159,6 +160,7 @@ class AppFixtures extends Fixture
         $tamagoyaki->setLevel(RecipeLevel::EASY);
         $tamagoyaki->setMainCategory(RecipeMainCategory::EGG);
         $manager->persist($tamagoyaki);
+        $this->addReference('recipe-tamagoyaki', $tamagoyaki);
 
         $oyakodon = new Recipe();
         $oyakodon->setName('Oyakodon (Poulet et Oeuf sur riz)');
@@ -168,6 +170,8 @@ class AppFixtures extends Fixture
         $oyakodon->setLevel(RecipeLevel::MEDIUM);
         $oyakodon->setMainCategory(RecipeMainCategory::MEAT);
         $manager->persist($oyakodon);
+        $this->addReference('recipe-oyakodon', $oyakodon);
+
 
         $haricotsGomaae = new Recipe();
         $haricotsGomaae->setName('Salade de haricots verts au sésame');
@@ -177,6 +181,8 @@ class AppFixtures extends Fixture
         $haricotsGomaae->setLevel(RecipeLevel::EASY);
         $haricotsGomaae->setMainCategory(RecipeMainCategory::VEGETABLE);
         $manager->persist($haricotsGomaae);
+        $this->addReference('recipe-haricots-gomaae', $haricotsGomaae);
+
 
         $hiyayakko = new Recipe();
         $hiyayakko->setName('Hiyayakko (Tofu froid)');
@@ -186,6 +192,8 @@ class AppFixtures extends Fixture
         $hiyayakko->setLevel(RecipeLevel::EASY);
         $hiyayakko->setMainCategory(RecipeMainCategory::TOFU);
         $manager->persist($hiyayakko);
+        $this->addReference('recipe-hiyayakko', $hiyayakko);
+
 
         $mapoTofu = new Recipe();
         $mapoTofu->setName('Mapo tofu');
@@ -195,6 +203,8 @@ class AppFixtures extends Fixture
         $mapoTofu->setLevel(RecipeLevel::MEDIUM);
         $mapoTofu->setMainCategory(RecipeMainCategory::MEAT);
         $manager->persist($mapoTofu);
+        $this->addReference('recipe-mapo-tofu', $mapoTofu);
+
 
         $donburiSaumon = new Recipe();
         $donburiSaumon->setName('Donburi au saumon mariné');
@@ -204,7 +214,8 @@ class AppFixtures extends Fixture
         $donburiSaumon->setLevel(RecipeLevel::EASY);
         $donburiSaumon->setMainCategory(RecipeMainCategory::FISH);
         $manager->persist($donburiSaumon);
-
+        $this->addReference('recipe-donburi-saumon', $donburiSaumon);
+        
         $ri1 = new RecipeIngredient();
         $ri1->setRecipe($karaage);
         $ri1->setIngredient($poulet);
@@ -497,6 +508,20 @@ class AppFixtures extends Fixture
         $rc18->setQuantity(0.5);
         $rc18->setUnit('c. à c.');
         $manager->persist($rc18);
+
+        $karaage->setDescription('Des morceaux de poulet marinés et frits, croustillants à l\'extérieur et juteux à l\'intérieur.');
+
+        $tamagoyaki->setDescription('Une omelette japonaise moelleuse et légèrement sucrée-salée, roulée en couches.');
+
+        $oyakodon->setDescription('Un bol de riz garni de poulet et d\'œuf mijotés dans une sauce sucrée-salée.');
+
+        $haricotsGomaae->setDescription('Des haricots verts croquants relevés d\'une sauce au sésame parfumée.');
+
+        $hiyayakko->setDescription('Un tofu soyeux servi froid, idéal pour les jours chauds d\'été.');
+
+        $mapoTofu->setDescription('Un plat mijoté épicé et umami, à base de tofu soyeux et de porc haché.');
+
+        $donburiSaumon->setDescription('Des cubes de saumon marinés servis sur un bol de riz, relevés d\'une touche de wasabi.');
 
         $manager->flush();
     }

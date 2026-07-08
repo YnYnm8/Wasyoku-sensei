@@ -1,18 +1,20 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Recipe index
 {% endblock %}
-
 {% block body %}
-	<h1>Recipe index</h1>
+
+	<div>
+		<p>{{ totalCount }}</p>
+		<p>RECETTE TOTAL</p>
+		<p>全{{ totalCount }}品</p>
+	</div>
 
 	<table class="table">
 		<thead>
 			<tr>
 				<th>Id</th>
+				<th>Photo</th>
 				<th>Name</th>
-				<th>Step</th>
-				<th>Season</th>
 				<th>Time</th>
 				<th>Level</th>
 				<th>MainCategory</th>
@@ -23,24 +25,35 @@
 			{% for recipe in recipes %}
 				<tr>
 					<td>{{ recipe.id }}</td>
+					<td>
+						{% set photo = recipe.media|first %}
+						{% if photo %}
+							<img src="{{ photo.url }}" alt="{{ recipe.name }}" width="80">
+						{% endif %}
+					</td>
 					<td>{{ recipe.name }}</td>
-					<td>{{ recipe.step }}</td>
-					<td>{{ recipe.season.label }}</td>
 					<td>{{ recipe.time }}</td>
 					<td>{{ recipe.level.label }}</td>
 					<td>{{ recipe.mainCategory.label }}</td>
 					<td>
 						<a href="{{ path('app_recipe_show', {'id': recipe.id}) }}">show</a>
-						<a href="{{ path('app_recipe_edit', {'id': recipe.id}) }}">edit</a>
 					</td>
 				</tr>
 			{% else %}
 				<tr>
-					<td colspan="8">no records found</td>
+					<td colspan="7">no records found</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 
-	<a href="{{ path('app_recipe_new') }}">Create new</a>
+	<div class="flex gap-2 justify-center mt-4">
+		{% for i in 1..totalPages %}
+		{# 1..totalPagesは、配列ではなく、「1から、totalPagesまでの数字を、その場で新しく作ってください」という指示です。 #}
+			<a href="{{ path('app_recipe_index', {'page': i}) }}" class="{% if i == currentPage %}font-bold underline{% endif %}">
+				{{ i }}
+			</a>
+		{% endfor %}
+	</div>
+
 {% endblock %}

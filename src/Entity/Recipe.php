@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\RecipeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\RecipeLevel;
 use App\Enum\RecipeSeason;
@@ -13,6 +14,7 @@ use App\Entity\RecipeCondiment;
 use App\Entity\Media;
 use App\Entity\RecipeShoppingList;
 use App\Enum\RecipeMainCategory;
+use App\Entity\Favorite;
 
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
 class Recipe
@@ -69,7 +71,14 @@ class Recipe
     #[ORM\OneToMany(targetEntity: ShoppingListSubstitute::class, mappedBy: 'recipe', orphanRemoval: true)]
     private Collection $shoppingListSubstitutes;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $description = null;
 
+    /**
+     * @var Collection<int, Favorite>
+     */
+    #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'recipe', orphanRemoval: true)]
+    private Collection $favorites;
 
 
     public function __construct()
@@ -79,6 +88,7 @@ class Recipe
         $this->media = new ArrayCollection();
         $this->recipeShoppingLists = new ArrayCollection();
         $this->shoppingListSubstitutes = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -295,5 +305,24 @@ class Recipe
     {
         $this->mainCategory = $mainCategory;
         return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+    /**
+     * @return Collection<int, Favorite>
+     */
+    public function getFavorites(): Collection
+    {
+        return $this->favorites;
     }
 }
