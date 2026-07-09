@@ -84,25 +84,25 @@ final class RecipeController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_recipe_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $recipe = new Recipe();
-        $form = $this->createForm(RecipeType::class, $recipe);
-        $form->handleRequest($request);
+    // #[Route('/new', name: 'app_recipe_new', methods: ['GET', 'POST'])]
+    // public function new(Request $request, EntityManagerInterface $entityManager): Response
+    // {
+    //     $recipe = new Recipe();
+    //     $form = $this->createForm(RecipeType::class, $recipe);
+    //     $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($recipe);
-            $entityManager->flush();
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         $entityManager->persist($recipe);
+    //         $entityManager->flush();
 
-            return $this->redirectToRoute('app_recipe_index', [], Response::HTTP_SEE_OTHER);
-        }
+    //         return $this->redirectToRoute('app_recipe_index', [], Response::HTTP_SEE_OTHER);
+    //     }
 
-        return $this->render('recipe/new.html.twig', [
-            'recipe' => $recipe,
-            'form' => $form,
-        ]);
-    }
+    //     return $this->render('recipe/new.html.twig', [
+    //         'recipe' => $recipe,
+    //         'form' => $form,
+    //     ]);
+    // }
 
     #[Route('/{id}', name: 'app_recipe_show', methods: ['GET'])]
     public function show(Recipe $recipe): Response
