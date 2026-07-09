@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Condiment{% endblock %}
+
+{% block body %}
+    <h1>Create new Condiment</h1>
+
+    {{ include('condiment/_form.html.twig') }}
+
+    <a href="{{ path('app_condiment_index') }}">back to list</a>
+{% endblock %}

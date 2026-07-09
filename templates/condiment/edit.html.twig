@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Condiment{% endblock %}
+
+{% block body %}
+    <h1>Edit Condiment</h1>
+
+    {{ include('condiment/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_condiment_index') }}">back to list</a>
+
+    {{ include('condiment/_delete_form.html.twig') }}
+{% endblock %}

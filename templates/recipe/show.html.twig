@@ -36,7 +36,7 @@
         </tr>
     </tbody>
 </table>
-div>
+<div>
     <h2>材料</h2>
     <p>INGREDIENT POUR</p>
 
@@ -45,7 +45,8 @@ div>
         <span id="person-count">1</span>
         <button id="increase-btn" type="button">＋</button>
         <span>PERSONNES</span>
-    </div>s
+    </div>
+    
 
     <ul>
         {% for ri in recipe.recipeIngredients %}
@@ -55,7 +56,21 @@ div>
             </li>
         {% endfor %}
     </ul>
+    <div>
+   
+    <ul>
+        {% for rc in recipe.recipeCondiments %}
+            <li>
+                <a href="{{ path('app_condiment_show', {'id': rc.condiment.id}) }}">
+                    {{ rc.condiment.name }}
+                </a>
+                - {{ rc.quantity }} {{ rc.unit }}
+            </li>
+        {% endfor %}
+    </ul>
 </div>
+</div>
+
 <div>
     <h2>作り方</h2>
     <p>PRÉPARATION</p>

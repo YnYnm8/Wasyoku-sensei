@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Condiment index{% endblock %}
+
+{% block body %}
+    <h1>Condiment index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Explanation</th>
+                <th>Composition</th>
+                <th>Use</th>
+                <th>Note</th>
+                <th>Url</th>
+                <th>ImageUrl</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for condiment in condiments %}
+            <tr>
+                <td>{{ condiment.id }}</td>
+                <td>{{ condiment.name }}</td>
+                <td>{{ condiment.explanation }}</td>
+                <td>{{ condiment.composition }}</td>
+                <td>{{ condiment.use }}</td>
+                <td>{{ condiment.note }}</td>
+                <td>{{ condiment.url }}</td>
+                <td>{{ condiment.imageUrl }}</td>
+                <td>
+                    <a href="{{ path('app_condiment_show', {'id': condiment.id}) }}">show</a>
+                    <a href="{{ path('app_condiment_edit', {'id': condiment.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_condiment_new') }}">Create new</a>
+{% endblock %}

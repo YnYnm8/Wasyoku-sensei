@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Condiment{% endblock %}
+
+{% block body %}
+    <h1>Condiment</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ condiment.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ condiment.name }}</td>
+            </tr>
+            <tr>
+                <th>Explanation</th>
+                <td>{{ condiment.explanation }}</td>
+            </tr>
+            <tr>
+                <th>Composition</th>
+                <td>{{ condiment.composition }}</td>
+            </tr>
+            <tr>
+                <th>Use</th>
+                <td>{{ condiment.use }}</td>
+            </tr>
+            <tr>
+                <th>Note</th>
+                <td>{{ condiment.note }}</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td>{{ condiment.url }}</td>
+            </tr>
+            <tr>
+                <th>ImageUrl</th>
+                <td>{{ condiment.imageUrl }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_condiment_index') }}">back to list</a>
+
+    <a href="{{ path('app_condiment_edit', {'id': condiment.id}) }}">edit</a>
+
+    {{ include('condiment/_delete_form.html.twig') }}
+{% endblock %}
