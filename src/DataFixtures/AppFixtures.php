@@ -94,7 +94,7 @@ class AppFixtures extends Fixture
         $sake->setUrl('https://www.amazon.fr/Umami-Sak%C3%A9-pour-cuisiner-500ml/dp/B0B59WD9TM');
         $sake->setImageUrl('https://placehold.co/400x300/png?text=Sake');
         $manager->persist($sake);
-
+        
         $mirin = new Condiment();
         $mirin->setName('Mirin');
         $mirin->setExplanation('Vin de riz doux et sucré, à faible teneur en alcool, apportant brillance et douceur aux plats japonais.');
@@ -103,6 +103,7 @@ class AppFixtures extends Fixture
         $mirin->setUrl('https://www.amazon.fr/Kikkoman-Mirin-cuisine-japonaise-1x750ml/dp/B004XWON0E');
         $mirin->setImageUrl('https://placehold.co/400x300/png?text=Mirin');
         $manager->persist($mirin);
+        $this->addReference('condiment-mirin', $mirin);
 
         $sucre = new Condiment();
         $sucre->setName('Sucre');
@@ -140,6 +141,16 @@ class AppFixtures extends Fixture
         $wasabi->setUrl('https://www.amazon.fr/P%C3%A2te-wasabi-tube-43g/dp/B09Z6D99BZ');
         $wasabi->setImageUrl('https://placehold.co/400x300/png?text=Wasabi');
         $manager->persist($wasabi);
+
+        
+        $dashi = new Condiment();
+        $dashi->setName('Dashi (bouillon japonais)');
+        $dashi->setExplanation('Bouillon de base de la cuisine japonaise, apportant une saveur umami essentielle. Peut être à base de konbu (algue), katsuobushi (bonite séchée), ou en granulés instantanés.');
+        $dashi->setComposition('Extraits de konbu et/ou katsuobushi, sel');
+        $dashi->setUse('Base des soupes, sauces et plats mijotés japonais.');
+        $dashi->setUrl('https://www.amazon.fr/Ajinomoto-Hondashi-Bouillon-Poisson-Japonais/dp/B00A2P2ZY0');
+        $dashi->setImageUrl('https://placehold.co/400x300/png?text=Dashi');
+        $manager->persist($dashi);
 
 
         $karaage = new Recipe();
@@ -215,7 +226,7 @@ class AppFixtures extends Fixture
         $donburiSaumon->setMainCategory(RecipeMainCategory::FISH);
         $manager->persist($donburiSaumon);
         $this->addReference('recipe-donburi-saumon', $donburiSaumon);
-        
+
         $ri1 = new RecipeIngredient();
         $ri1->setRecipe($karaage);
         $ri1->setIngredient($poulet);
