@@ -4,7 +4,7 @@ module.exports = {
     "./assets/**/*.js",
     "./templates/**/*.html.twig",
   ],
-  theme: {
+   theme: {
     extend: {
       colors: {
         washoku: {
@@ -12,6 +12,9 @@ module.exports = {
           input: '#1F1A18',
           inputtext: '#8D847E',
           red: '#8C2121',
+          redhover: '#701A1A',
+          cream: '#FBF8F1',
+          beige: '#E3DBCD',
         },
       },
       fontFamily: {

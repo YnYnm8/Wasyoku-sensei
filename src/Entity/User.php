@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Enum\RoleEnum;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,11 +24,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
-    /**
-     * @var list<string> The user roles
-     */
-    #[ORM\Column]
-    private array $roles = [];
+    #[ORM\Column(length: 20, enumType: RoleEnum::class)]
+    private RoleEnum $role = RoleEnum::USER;
 
     /**
      * @var string The hashed password
@@ -76,17 +75,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return (string) $this->email;
     }
 
+    public function getRole(): RoleEnum
+    {
+        return $this->role;
+    }
+
+    public function setRole(RoleEnum $role): static
+    {
+        $this->role = $role;
+        return $this;
+    }
+
+    /**
+     * SymfonyのUserInterface契約を満たすためのメソッド。
+     * 戻り値は必ずarrayでなければならない（フレームワーク側の仕様）。
+     * 実体は $role という単一のEnum値だが、ここでSymfonyが期待する配列形式に変換する。
+     *
+     * @return list<string>
+     */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        $roles[] = 'ROLE_USER';
+        $roles = [$this->role->value];
+        $roles[] = RoleEnum::USER->value;
+
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): static
+    /**
+     * ROLE_ADMINかどうかを判定する
+     */
+    public function isAdmin(): bool
     {
-        $this->roles = $roles;
-        return $this;
+        return $this->role === RoleEnum::ADMIN;
     }
 
     public function getPassword(): ?string
@@ -103,7 +123,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
         return $data;
     }
 
