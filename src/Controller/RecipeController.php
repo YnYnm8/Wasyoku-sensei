@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Enum\RecipeLevel;
 use App\Enum\RecipeMainCategory;
 use App\Enum\RecipeSeason;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/recipe')]
 final class RecipeController extends AbstractController
@@ -84,25 +85,26 @@ final class RecipeController extends AbstractController
         ]);
     }
 
-    // #[Route('/new', name: 'app_recipe_new', methods: ['GET', 'POST'])]
-    // public function new(Request $request, EntityManagerInterface $entityManager): Response
-    // {
-    //     $recipe = new Recipe();
-    //     $form = $this->createForm(RecipeType::class, $recipe);
-    //     $form->handleRequest($request);
+    #[Route('/new', name: 'app_recipe_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $recipe = new Recipe();
+        $form = $this->createForm(RecipeType::class, $recipe);
+        $form->handleRequest($request);
 
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         $entityManager->persist($recipe);
-    //         $entityManager->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($recipe);
+            $entityManager->flush();
 
-    //         return $this->redirectToRoute('app_recipe_index', [], Response::HTTP_SEE_OTHER);
-    //     }
+            return $this->redirectToRoute('app_recipe_index', [], Response::HTTP_SEE_OTHER);
+        }
 
-    //     return $this->render('recipe/new.html.twig', [
-    //         'recipe' => $recipe,
-    //         'form' => $form,
-    //     ]);
-    // }
+        return $this->render('recipe/new.html.twig', [
+            'recipe' => $recipe,
+            'form' => $form,
+        ]);
+    }
 
     #[Route('/{id}', name: 'app_recipe_show', methods: ['GET'])]
     public function show(Recipe $recipe): Response
@@ -113,6 +115,7 @@ final class RecipeController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_recipe_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Recipe $recipe, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(RecipeType::class, $recipe);
@@ -131,6 +134,7 @@ final class RecipeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_recipe_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Recipe $recipe, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $recipe->getId(), $request->getPayload()->getString('_token'))) {

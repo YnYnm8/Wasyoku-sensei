@@ -64,10 +64,11 @@
 			<ul>
 				{% for rc in recipe.recipeCondiments %}
 					<li>
-						{{ rc.condiment.name }}-{{ rc.quantity }} {{ rc.unit }}
+						{{ rc.condiment.name }}-{{ rc.quantity }}
+						{{ rc.unit }}
 
 						{#  rc.condiment.condimentSubstituteGroups で、この調味料に紐づく、代替品グループを、すべて取得する
-					    |length で、その、個数を、数える　> 0 で、「1つでも、あれば」という、条件にする代替品が、無い調味料には、ボタン自体を、表示しないため）#}
+																	    |length で、その、個数を、数える　> 0 で、「1つでも、あれば」という、条件にする代替品が、無い調味料には、ボタン自体を、表示しないため）#}
 
 						{% if rc.condiment.condimentSubstituteGroups|length > 0 %}
 							<button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').showModal()">
@@ -93,14 +94,24 @@
 	</div>
 
 
-<div>
-	<h2>作り方</h2>
-	<p>PRÉPARATION</p>
-	<ol>
-		<li>{{ recipe.step }}</li>
-	</ol>
+	<div>
+		<h2>作り方</h2>
+		<p>PRÉPARATION</p>
+		<ol>
+			<li>{{ recipe.step }}</li>
+		</ol>
 
-</div>
+	</div>
 
-<a href="{{ path('app_recipe_index') }}">back to list</a>
-{{ include('recipe/_delete_form.html.twig') }}{% endblock %}
+	{% if is_granted('ROLE_ADMIN') %}
+		<a href="{{ path('app_recipe_new') }}" class="btn-primary">
+			+ Ajouter une nouvelle recette
+		</a>
+	{% endif %}
+
+	{% if is_granted('ROLE_ADMIN') %}
+		<a href="{{ path('app_recipe_index') }}">back to list</a>
+		{{ include('recipe/_delete_form.html.twig') }}
+
+	{% endif %}
+{% endblock %}
