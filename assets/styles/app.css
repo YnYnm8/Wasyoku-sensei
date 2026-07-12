@@ -8,15 +8,7 @@
     letter-spacing: 0.15em;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-.vertical-text {
-    writing-mode: vertical-rl;
-    text-orientation: upright;
-    letter-spacing: 0.15em;
-}
 
 /* メインボタン（赤、幅いっぱい） - 確定、送信などに使用 */
 .btn-primary {
