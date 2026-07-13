@@ -3,11 +3,101 @@
 {% block title %}Edit Recipe{% endblock %}
 
 {% block body %}
-    <h1>Edit Recipe</h1>
+<h1>Edit Recipe</h1>
 
-    {{ include('recipe/_form.html.twig', {'button_label': 'Update'}) }}
+{{ include('recipe/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('app_recipe_index') }}">back to list</a>
+<div>
+    <h2>Ingrédients</h2>
+    <ul>
+        {% for ri in recipe.recipeIngredients %}
+            <li>
+                {{ ri.ingredient.name }} — {{ ri.quantity }} {{ ri.unit }}
+                <form method="post" action="{{ path('app_recipe_ingredient_delete', {id: recipe.id, recipeIngredientId: ri.id}) }}" style="display:inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_ingredient' ~ ri.id) }}">
+                    <button type="submit" onclick="return confirm('Retirer cet ingrédient ?')">Retirer</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
 
-    {{ include('recipe/_delete_form.html.twig') }}
+    <button type="button" onclick="document.getElementById('add-ingredient-dialog').showModal()">
+        + Ajouter un ingrédient
+    </button>
+
+    <dialog id="add-ingredient-dialog">
+        <form method="post" action="{{ path('app_recipe_ingredient_add', {id: recipe.id}) }}">
+            <label>
+                Ingrédient
+                <input type="text" name="ingredient_name" list="ingredient-list" required>
+            </label>
+            <datalist id="ingredient-list">
+                {% for ingredient in ingredients %}
+                    <option value="{{ ingredient.name }}"></option>
+                {% endfor %}
+            </datalist>
+
+            <label>
+                Quantité
+                <input type="number" step="0.1" name="quantity" required>
+            </label>
+
+            <label>
+                Unité
+                <input type="text" name="unit" required>
+            </label>
+
+            <button type="submit" class="btn-primary">Ajouter</button>
+            <button type="button" onclick="document.getElementById('add-ingredient-dialog').close()" class="btn-secondary">Annuler</button>
+        </form>
+    </dialog>
+
+    <h2>Condiments</h2>
+    <ul>
+        {% for rc in recipe.recipeCondiments %}
+            <li>
+                {{ rc.condiment.name }} — {{ rc.quantity }} {{ rc.unit }}
+                <form method="post" action="{{ path('app_recipe_condiment_delete', {id: recipe.id, recipeCondimentId: rc.id}) }}" style="display:inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_condiment' ~ rc.id) }}">
+                    <button type="submit" onclick="return confirm('Retirer ce condiment ?')">Retirer</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <button type="button" onclick="document.getElementById('add-condiment-dialog').showModal()">
+        + Ajouter un condiment
+    </button>
+
+    <dialog id="add-condiment-dialog">
+        <form method="post" action="{{ path('app_recipe_condiment_add', {id: recipe.id}) }}">
+            <label>
+                Condiment
+                <select name="condiment_id" required>
+                    <option value="">-- Choisir --</option>
+                    {% for condiment in condiments %}
+                        <option value="{{ condiment.id }}">{{ condiment.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label>
+                Quantité
+                <input type="number" step="0.1" name="quantity" required>
+            </label>
+
+            <label>
+                Unité
+                <input type="text" name="unit" required>
+            </label>
+
+            <button type="submit" class="btn-primary">Ajouter</button>
+            <button type="button" onclick="document.getElementById('add-condiment-dialog').close()" class="btn-secondary">Annuler</button>
+        </form>
+    </dialog>
+</div>
+
+<a href="{{ path('app_recipe_index') }}">back to list</a>
+
+{{ include('recipe/_delete_form.html.twig') }}
 {% endblock %}
