@@ -21,14 +21,23 @@ use App\Repository\RecipeIngredientRepository;
 use App\Repository\RecipeCondimentRepository;
 use App\Entity\RecipeCondiment;
 use App\Repository\CondimentRepository;
+use App\Repository\FavoriteRepository;
 
 
 #[Route('/recipe')]
 final class RecipeController extends AbstractController
 {
     #[Route(name: 'app_recipe_index', methods: ['GET'])]
-    public function index(RecipeRepository $recipeRepository, Request $request): Response
+    public function index(RecipeRepository $recipeRepository, Request $request, FavoriteRepository $favoriteRepository): Response
     {
+        $favoriteRecipeIds = [];
+        if ($this->getUser()) {
+            $favorites = $favoriteRepository->findBy(['user' => $this->getUser()]);
+            // $favorites の中身を、1個ずつ順番に取り出しながら処理する
+            foreach ($favorites as $favorite) {
+                $favoriteRecipeIds[] = $favorite->getRecipe()->getId();
+            }
+        }
         // 現在の「ページ番号」をURLから受け取る（例: ?page=2）
         // 指定が無ければ、1ページ目とする
         $page = $request->query->getInt('page', 1);
@@ -86,6 +95,7 @@ final class RecipeController extends AbstractController
             'currentPage' => $page,
             'totalPages' => $totalPages,
             'totalCount' => $totalCount,
+            'favoriteRecipeIds' => $favoriteRecipeIds,
         ]);
     }
 
@@ -168,7 +178,7 @@ final class RecipeController extends AbstractController
             'form' => $form,
             // <datalist>で使う、既存材料の名前候補
             'ingredients' => $ingredientRepository->findAll(),
-            'condiments' =>$condimentRepository->findAll(),
+            'condiments' => $condimentRepository->findAll(),
         ]);
     }
 
@@ -243,7 +253,7 @@ final class RecipeController extends AbstractController
 
         return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
     }
-// US1.3 CA11・CA12・CA13：ROLE_ADMINのみアクセス可能
+    // US1.3 CA11・CA12・CA13：ROLE_ADMINのみアクセス可能
     // 調味料は既にCondimentとして管理されている前提なので、材料と違い「新規作成」は行わず、
     // 既存のCondimentを選んでRecipeに紐付けるだけのシンプルな処理になる
     #[Route('/{id}/condiment/add', name: 'app_recipe_condiment_add', methods: ['POST'])]
@@ -303,6 +313,4 @@ final class RecipeController extends AbstractController
 
         return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
     }
-
-
 }

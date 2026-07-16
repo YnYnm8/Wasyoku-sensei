@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello FavoriteController!{% endblock %}
+
+{% block body %}
+<div class="grid grid-cols-3 gap-4">
+    {% for favorite in favorites %}
+        {% include 'recipe/_card.html.twig' with {
+            recipe: favorite.recipe,
+            favoriteRecipeIds: [favorite.recipe.id]
+        } %}
+    {% else %}
+        <p>Vous n'avez pas encore de recette favorite.</p>
+    {% endfor %}
+</div>
+{% endblock %}

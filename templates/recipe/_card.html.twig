@@ -1,0 +1,44 @@
+<div class="card-popup">
+	{% set photo = recipe.media|first %}
+	{% if photo %}
+		<img src="{{ photo.url }}" alt="{{ recipe.name }}">
+	{% endif %}
+
+	<h3>{{ recipe.name }}</h3>
+	<p>{{ recipe.time }}
+		—
+		{{ recipe.level.label }}</p>
+
+	{# ログインしているユーザーにだけ、お気に入りボタンを表示する #}
+	{# app.user は「今ログインしている人」を表すTwig変数で、未ログインならnullになる #}
+	{% if app.user %}
+
+		{# favoriteRecipeIds（コントローラーから渡された、お気に入り済みレシピIDの配列）の中に、
+		       このカードのレシピIDが含まれているかどうかで、
+		       「解除ボタン（塗りつぶしハート）」か「追加ボタン（枠線ハート）」かを切り替える #}
+		{% if recipe.id in favoriteRecipeIds %}
+
+			{# 既にお気に入り済みの場合：解除フォーム
+			           CSRFトークンのラベルは recipe.id ベースで発行し、
+			           FavoriteController の removeFavorite() と一致させる #}
+			<form method="post" action="{{ path('app_favorite_remove', {id: recipe.id}) }}">
+				<input type="hidden" name="_token" value="{{ csrf_token('delete_favorite' ~ recipe.id) }}">
+				<button type="submit">♥</button>
+			</form>
+
+		{% else %}
+
+			{# まだお気に入りに入っていない場合：追加フォーム
+			   CSRFトークンのラベルは recipe.id ベースで発行し、
+			   FavoriteController の addFavorite() と一致させる #}
+			<form method="post" action="{{ path('app_favorite_add', {id: recipe.id}) }}">
+				<input type="hidden" name="_token" value="{{ csrf_token('add_favorite' ~ recipe.id) }}">
+				<button type="submit">♡</button>
+			</form>
+
+		{% endif %}
+
+	{% endif %}
+
+	<a href="{{ path('app_recipe_show', {'id': recipe.id}) }}">Voir la recette</a>
+</div>

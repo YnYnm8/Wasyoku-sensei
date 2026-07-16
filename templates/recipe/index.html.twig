@@ -1,3 +1,4 @@
+
 {% extends 'base.html.twig' %}
 {% block title %}Recipe index
 {% endblock %}
@@ -9,43 +10,16 @@
 		<p>全{{ totalCount }}品</p>
 	</div>
 
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>Photo</th>
-				<th>Name</th>
-				<th>Time</th>
-				<th>Level</th>
-				<th>MainCategory</th>
-				<th>actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for recipe in recipes %}
-				<tr>
-					<td>{{ recipe.id }}</td>
-					<td>
-						{% set photo = recipe.media|first %}
-						{% if photo %}
-							<img src="{{ photo.url }}" alt="{{ recipe.name }}" width="80">
-						{% endif %}
-					</td>
-					<td>{{ recipe.name }}</td>
-					<td>{{ recipe.time }}</td>
-					<td>{{ recipe.level.label }}</td>
-					<td>{{ recipe.mainCategory.label }}</td>
-					<td>
-						<a href="{{ path('app_recipe_show', {'id': recipe.id}) }}">show</a>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="7">no records found</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+<div class="grid grid-cols-3 gap-4">
+    {% for recipe in recipes %}
+        {% include 'recipe/_card.html.twig' with {
+            recipe: recipe,
+            favoriteRecipeIds: favoriteRecipeIds
+        } %}
+    {% else %}
+        <p>no records found</p>
+    {% endfor %}
+</div>
 
 	<div class="flex gap-2 justify-center mt-4">
 		{% for i in 1..totalPages %}
