@@ -3,6 +3,11 @@
 {% block title %}Hello FavoriteController!{% endblock %}
 
 {% block body %}
+<div>
+<span>
+{{totalCount}} RECETTES
+</span>
+</div>
 <div class="grid grid-cols-3 gap-4">
     {% for favorite in favorites %}
         {% include 'recipe/_card.html.twig' with {

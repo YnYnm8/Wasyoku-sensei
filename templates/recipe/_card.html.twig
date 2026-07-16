@@ -14,13 +14,13 @@
 	{% if app.user %}
 
 		{# favoriteRecipeIds（コントローラーから渡された、お気に入り済みレシピIDの配列）の中に、
-		       このカードのレシピIDが含まれているかどうかで、
-		       「解除ボタン（塗りつぶしハート）」か「追加ボタン（枠線ハート）」かを切り替える #}
+				       このカードのレシピIDが含まれているかどうかで、
+				       「解除ボタン（塗りつぶしハート）」か「追加ボタン（枠線ハート）」かを切り替える #}
 		{% if recipe.id in favoriteRecipeIds %}
 
 			{# 既にお気に入り済みの場合：解除フォーム
-			           CSRFトークンのラベルは recipe.id ベースで発行し、
-			           FavoriteController の removeFavorite() と一致させる #}
+						           CSRFトークンのラベルは recipe.id ベースで発行し、
+						           FavoriteController の removeFavorite() と一致させる #}
 			<form method="post" action="{{ path('app_favorite_remove', {id: recipe.id}) }}">
 				<input type="hidden" name="_token" value="{{ csrf_token('delete_favorite' ~ recipe.id) }}">
 				<button type="submit">♥</button>
@@ -29,8 +29,8 @@
 		{% else %}
 
 			{# まだお気に入りに入っていない場合：追加フォーム
-			   CSRFトークンのラベルは recipe.id ベースで発行し、
-			   FavoriteController の addFavorite() と一致させる #}
+						   CSRFトークンのラベルは recipe.id ベースで発行し、
+						   FavoriteController の addFavorite() と一致させる #}
 			<form method="post" action="{{ path('app_favorite_add', {id: recipe.id}) }}">
 				<input type="hidden" name="_token" value="{{ csrf_token('add_favorite' ~ recipe.id) }}">
 				<button type="submit">♡</button>
@@ -39,6 +39,11 @@
 		{% endif %}
 
 	{% endif %}
+	{# US6（買い物リスト機能）が実装されるまで、一時的に非表示にする
+	   TODO: US6.1完成後、このコメントを解除する #}
+	{# {% if showShoppingListButton %}
+	    <button type="button" class="btn-secondary">+ Ajouter à une liste</button>
+	{% endif %} #}
 
 	<a href="{{ path('app_recipe_show', {'id': recipe.id}) }}">Voir la recette</a>
 </div>

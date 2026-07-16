@@ -21,6 +21,7 @@ final class FavoriteController extends AbstractController
         $favorites = $favoriteRepository->findBy(['user'=>$this->getUser()]);
         return $this->render('favorite/index.html.twig', [
             'favorites' => $favorites,
+            'totalCount'=>count($favorites),
         ]);
     }
 

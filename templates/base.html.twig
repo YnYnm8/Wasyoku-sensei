@@ -16,6 +16,29 @@
     {% endblock %}
 </head>
 <body>
+<header>
+<nav>
+<a href = "{{path('app_home')}}">Wasyoku Sensei</a>
+{% if is_granted('ROLE_ADMIN') %}
+<div>
+  <span>Admin</span>
+                    <a href="{{ path('app_recipe_index') }}">Recettes</a>
+                    <a href="{{ path('app_condiment_index') }}">Condiments</a>
+
+</div>
+   {% endif %}
+   {% if app.user %}
+    <a href="{{ path('app_favorite_index') }}">Mes favoris</a>
+     {% else %}
+      <a href="{{ path('app_login') }}">Se connecter</a>
+   {% endif %}
+
+</nav>
+
+    
+
+
+</header>
     {% block body %}{% endblock %}
 
     {% for favori in app.flashes('favori_added') %}
@@ -37,5 +60,10 @@
             document.addEventListener('turbo:load', openFavoriDialog);
         </script>
     {% endfor %}
+    <footer>
+        <p>和 WASYOKU</p>
+        {# これはTwigの機能で、「今日の日付から、年（西暦4桁）だけを取り出す」という意味 #}
+        <p>&copy; {{ "now"|date("Y") }} WASYOKU - Tous droits réservés.</p>
+    </footer>
 </body>
 </html>
