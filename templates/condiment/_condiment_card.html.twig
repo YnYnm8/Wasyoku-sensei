@@ -1,0 +1,8 @@
+<div class="card-popup">
+    <img src="{{ condiment.imageUrl }}" alt="{{ condiment.name }}">
+    <h3>{{ condiment.name }}</h3>
+    <p>{{ condiment.explanation|slice(0, 40) }}...</p>
+    <a href="{{ path('app_condiment_show', {'id': condiment.id}) }}">
+        Voir le détail
+    </a>
+</div>

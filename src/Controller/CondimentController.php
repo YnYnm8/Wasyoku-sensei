@@ -14,13 +14,26 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/condiment')]
 final class CondimentController extends AbstractController
 {
-    #[Route(name: 'app_condiment_index', methods: ['GET'])]
-    public function index(CondimentRepository $condimentRepository): Response
-    {
-        return $this->render('condiment/index.html.twig', [
-            'condiments' => $condimentRepository->findAll(),
-        ]);
-    }
+  #[Route(name: 'app_condiment_index', methods: ['GET'])]
+public function index(CondimentRepository $condimentRepository, Request $request): Response
+{
+    $page = $request->query->getInt('page', 1);
+    $limit = 5;
+
+    $condiments = $condimentRepository->findAll();
+    $totalCount = count($condiments);
+    $condiments = array_slice($condiments, ($page - 1) * $limit, $limit);
+
+    $totalPages = (int) ceil($totalCount / $limit);
+
+    return $this->render('condiment/index.html.twig', [
+        'condiments' => $condiments,
+        'currentPage' => $page,
+        'totalCount' => $totalCount,
+        'totalPages' => $totalPages,
+    ]);
+}
+    
 
     #[Route('/new', name: 'app_condiment_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -71,7 +84,7 @@ final class CondimentController extends AbstractController
     #[Route('/{id}', name: 'app_condiment_delete', methods: ['POST'])]
     public function delete(Request $request, Condiment $condiment, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$condiment->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $condiment->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($condiment);
             $entityManager->flush();
         }
