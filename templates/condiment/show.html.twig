@@ -35,8 +35,27 @@
 		</ul>
 
 	</div>
-	<button>substitution</button>
-
+	<div>
+		<p>SUBSTITUTION・代用</p>
+		{% if condiment.condimentSubstituteGroups|length > 0 %}
+			{% for group in condiment.condimentSubstituteGroups %}
+				<p>
+					{% for substitute in group.condimentSubstitutes %}
+						{{ substitute.name }}
+						{{ substitute.quantity }}{{ substitute.unit }}
+						{% if not loop.last %}
+							+
+						{% endif %}
+					{% endfor %}
+				</p>
+			{% endfor %}
+			<p>
+				<em>Attention : l'utilisation d'un substitut peut légèrement modifier le goût authentique du plat.</em>
+			</p>
+		{% else %}
+			<p>Aucun substitut disponible.</p>
+		{% endif %}
+	</div>
 
 	<div>
 		<p>OU L'ACHETER 購入</p>
