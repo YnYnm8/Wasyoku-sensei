@@ -3,11 +3,65 @@
 {% block title %}Edit Condiment{% endblock %}
 
 {% block body %}
-    <h1>Edit Condiment</h1>
+<h1>Edit Condiment</h1>
 
-    {{ include('condiment/_form.html.twig', {'button_label': 'Update'}) }}
+{{ include('condiment/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('app_condiment_index') }}">back to list</a>
+<div>
+    <h2>Substituts</h2>
 
-    {{ include('condiment/_delete_form.html.twig') }}
+    <button type="button" onclick="document.getElementById('add-substitute-dialog').showModal()">
+        + Ajouter un substitut
+    </button>
+
+    <dialog id="add-substitute-dialog">
+        <form method="post" action="{{ path('app_condiment_substitute_add', {id: condiment.id}) }}">
+            <label>
+                Nom du groupe
+                <input type="text" name="groupLabel_name" required>
+            </label>
+
+            <label>
+                Nom du substitut
+                <input type="text" name="condimentSubstitute_name" required>
+            </label>
+
+            <label>
+                Quantité
+                <input type="number" step="0.1" name="quantity" required>
+            </label>
+
+            <label>
+                Unité
+                <input type="text" name="unit" required>
+            </label>
+
+            <button type="submit" class="btn-primary">Ajouter</button>
+            <button type="button" onclick="document.getElementById('add-substitute-dialog').close()" class="btn-secondary">Annuler</button>
+        </form>
+    </dialog>
+
+    <ul>
+        {% for group in condiment.condimentSubstituteGroups %}
+            <li>
+                <strong>{{ group.label }}</strong>
+                <ul>
+                    {% for substitute in group.condimentSubstitutes %}
+                        <li>
+                            {{ substitute.name }} — {{ substitute.quantity }} {{ substitute.unit }}
+                            <form method="post" action="{{ path('app_condiment_substitute_delete', {id: condiment.id, substituteId: substitute.id}) }}" style="display:inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_substitute' ~ substitute.id) }}">
+                                <button type="submit" onclick="return confirm('Retirer ce substitut ?')">Retirer</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<a href="{{ path('app_condiment_index') }}">back to list</a>
+
+{{ include('condiment/_delete_form.html.twig') }}
 {% endblock %}
