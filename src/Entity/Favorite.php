@@ -26,6 +26,9 @@ class Favorite
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\Column]
+    private ?int $person = 1;
+
     // これは「カラムの代わり」ではなく、「カラムに自動で値を入れてくれる仕組み」です。
     public function __construct()
     {
@@ -78,4 +81,16 @@ class Favorite
 
         return $this;
     }
+
+    public function getPerson(): ?int
+    {
+        return $this->person;
+    }
+
+    public function setPerson(?int $person): static
+    {
+        $this->person = $person;
+        return $this;
+    }
+ 
 }
