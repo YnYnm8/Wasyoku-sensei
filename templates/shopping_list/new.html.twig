@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma liste de courses{% endblock %}
+
+{% block body %}
+<h1>買い物リスト</h1>
+<p>LISTES DE COURSES</p>
+
+<p>{{ favorites|length }} RECETTES</p>
+
+{# US6.1：セッションに保存されたレシピIDから取得した、Favorite（お気に入り記録）を
+   1件ずつループする。Recipeだけでなく、その時に選ばれていた人数(person)も
+   一緒に持っているのが、favoritesを使う理由 #}
+{% for favorite in favorites %}
+    {# {% set %} で、favorite.recipe を毎回書かずに済むよう、短い名前を付けておく #}
+    {% set recipe = favorite.recipe %}
+    <div>
+        <h3>{{ recipe.name }}</h3>
+
+        {# US6.1 CA2：人数はお気に入り登録時の値が初期値。この画面でも+/-ボタンで変更できる
+           id にレシピIDを含めているのは、複数レシピが同じ画面に並ぶため、
+           JSがどのレシピのボタンか区別できるようにするため #}
+        <div>
+            <button id="decrease-btn-{{ recipe.id }}" type="button" data-recipe-id="{{ recipe.id }}">−</button>
+            <span id="person-count-{{ recipe.id }}">{{ favorite.person }}</span>
+            <button id="increase-btn-{{ recipe.id }}" type="button" data-recipe-id="{{ recipe.id }}">＋</button>
+        </div>
+
+        {# US6.1 CA3・CA4：材料は、レシピをまたいで合算せず、レシピごとに分けて表示する #}
+        <h4>材料</h4>
+        <ul>
+            {% for ri in recipe.recipeIngredients %}
+                {# data-base-quantity・data-recipe-id は、後でJSが「どの材料を、どのレシピの人数で」
+                   再計算すればいいかを判断するための目印 #}
+                <li data-base-quantity="{{ ri.quantity }}" data-recipe-id="{{ recipe.id }}">
+                    {# US6.1 CA5：チェックを外せば、このアイテムを最終的なリストから除外できる #}
+                    <input type="checkbox" checked>
+                    {{ ri.ingredient.name }}
+                    <span class="quantity">{{ ri.quantity }}</span>
+                    {{ ri.unit }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h4>調味料</h4>
+        <ul>
+            {% for rc in recipe.recipeCondiments %}
+                <li data-base-quantity="{{ rc.quantity }}" data-recipe-id="{{ recipe.id }}">
+                    <input type="checkbox" checked>
+                    {{ rc.condiment.name }}
+                    <span class="quantity">{{ rc.quantity }}</span>
+                    {{ rc.unit }}
+
+                    {# US6.1 CA7：代替品は、選択用のチェックボックスは付けず、
+                       あくまで参考情報（メモ的な位置づけ）として表示するだけにする。
+                       US3.3で既に作った代替品データを、そのまま再利用している #}
+                    {% if rc.condiment.condimentSubstituteGroups|length > 0 %}
+                        <p><small>
+                            ※ Substitut possible :
+                            {% for group in rc.condiment.condimentSubstituteGroups %}
+                                {% for substitute in group.condimentSubstitutes %}
+                                    {{ substitute.name }} {{ substitute.quantity }}{{ substitute.unit }}{% if not loop.last %} + {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </small></p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+
+        {# US6.1 CA8：チェックすると、このレシピの作り方（step）が、
+           最終的な確認メールに一緒に添付される（US6.2で処理） #}
+        <label>
+            <input type="checkbox" name="include_recipe_{{ recipe.id }}">
+            Inclure la recette
+        </label>
+    </div>
+{% endfor %}
+
+{# US6.1 CA6：レシピに含まれない、日用品などを自由入力で追加できるメモ欄 #}
+<div>
+    <h2>メモを追加</h2>
+    <p>AJOUTER UN MEMO</p>
+    <textarea placeholder="Article, produit..."></textarea>
+</div>
+
+<button type="button" class="btn-primary">
+    Valider ma liste
+</button>
+{% endblock %}

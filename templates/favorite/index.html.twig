@@ -1,21 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello FavoriteController!{% endblock %}
+{% block title %}Mes Favoris{% endblock %}
 
 {% block body %}
 <div>
-<span>
-{{totalCount}} RECETTES
-</span>
+    <span>{{ totalCount }} RECETTES</span>
 </div>
+
 <div class="grid grid-cols-3 gap-4">
     {% for favorite in favorites %}
-        {% include 'recipe/_card.html.twig' with {
-            recipe: favorite.recipe,
-            favoriteRecipeIds: [favorite.recipe.id]
-        } %}
+        <div>
+            <label>
+                <input type="checkbox" class="shopping-list-checkbox" value="{{ favorite.recipe.id }}" checked>
+                Sélectionner
+            </label>
+            {% include 'recipe/_card.html.twig' with {
+                recipe: favorite.recipe,
+                favoriteRecipeIds: [favorite.recipe.id]
+            } %}
+        </div>
     {% else %}
         <p>Vous n'avez pas encore de recette favorite.</p>
     {% endfor %}
 </div>
+
+{% if favorites|length > 0 %}
+    <form method="post" action="{{ path('app_shopping_list_create') }}" id="shopping-list-form">
+        <button type="submit" class="btn-primary">
+            Créer la liste de courses
+        </button>
+    </form>
+{% endif %}
+
+{# 「フォームが送信される瞬間、ページ中のチェック済みチェックボックスを全部集めてきて、その1つ1つの値（レシピID）を、送信用フォームの中に、隠しフィールドとして、その場で埋め込んでから、送信する」 #}
+<script>
+    document.getElementById('shopping-list-form')?.addEventListener('submit', function (e) {
+        // チェックされているチェックボックスだけを集める
+        const checked = document.querySelectorAll('.shopping-list-checkbox:checked');
+        checked.forEach(function (checkbox) {
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'recipe_ids[]';
+            hidden.value = checkbox.value;
+            this.appendChild(hidden);
+        }, this);
+    });
+</script>
 {% endblock %}

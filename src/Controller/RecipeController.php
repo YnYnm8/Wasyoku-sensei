@@ -129,10 +129,18 @@ final class RecipeController extends AbstractController
 
     // 訪問者・管理者どちらもアクセス可能（保護なし）
     #[Route('/{id}', name: 'app_recipe_show', methods: ['GET'])]
-    public function show(Recipe $recipe): Response
+    public function show(Recipe $recipe ,FavoriteRepository $favoriteRepository): Response
     {
+        $favoriteRecipeIds = [];
+        if ($this->getUser()) {
+            $favorites = $favoriteRepository->findBy(['user' => $this->getUser()]);
+            foreach ($favorites as $favorite) {
+                $favoriteRecipeIds[] = $favorite->getRecipe()->getId();
+            }
+        }
         return $this->render('recipe/show.html.twig', [
             'recipe' => $recipe,
+            'favoriteRecipeIds'=>$favoriteRecipeIds,
         ]);
     }
 

@@ -10,7 +10,7 @@
 		{{ recipe.level.label }}</p>
 
 	{# ログインしているユーザーにだけ、お気に入りボタンを表示する #}
-	{# app.user は「今ログインしている人」を表すTwig変数で、未ログインならnullになる #}
+	
 	{% if app.user %}
 
 		{# favoriteRecipeIds（コントローラーから渡された、お気に入り済みレシピIDの配列）の中に、
@@ -26,15 +26,7 @@
 				<button type="submit">♥</button>
 			</form>
 
-		{% else %}
-
-			{# まだお気に入りに入っていない場合：追加フォーム
-						   CSRFトークンのラベルは recipe.id ベースで発行し、
-						   FavoriteController の addFavorite() と一致させる #}
-			<form method="post" action="{{ path('app_favorite_add', {id: recipe.id}) }}">
-				<input type="hidden" name="_token" value="{{ csrf_token('add_favorite' ~ recipe.id) }}">
-				<button type="submit">♡</button>
-			</form>
+		
 
 		{% endif %}
 
