@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Entity;
+
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,6 +18,12 @@ class Media
 
     #[ORM\Column(length: 255)]
     private ?string $url = null;
+
+    #[ORM\Column(length: 20, options: ['default' => 'photo'])]
+    private ?string $type = 'photo';
+
+    #[ORM\Column(nullable: true)]
+    private ?int $stepOrder = null;  // 追加：写真の場合のみ使う（動画では null のまま）
 
     #[ORM\ManyToOne(inversedBy: 'media')]
     #[ORM\JoinColumn(nullable: false)]
@@ -54,6 +62,27 @@ class Media
         return $this;
     }
 
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function getStepOrder(): ?int
+    {
+        return $this->stepOrder;
+    }
+
+    public function setStepOrder(?int $stepOrder): static
+    {
+        $this->stepOrder = $stepOrder;
+        return $this;
+    }
     public function getRecipe(): ?Recipe
     {
         return $this->recipe;
