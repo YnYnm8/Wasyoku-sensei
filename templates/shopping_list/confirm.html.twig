@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmer ma liste{% endblock %}
+
+{% block body %}
+<h1>私の買い物メモ</h1>
+<p>MA LISTE DE COURSES</p>
+
+<h2>選択された内容</h2>
+<pre>{{ allData|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+
+<h2>メモ</h2>
+<p>{{ memo }}</p>
+{% endblock %}
