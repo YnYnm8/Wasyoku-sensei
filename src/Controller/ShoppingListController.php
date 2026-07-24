@@ -81,26 +81,50 @@ public function confirmShow(
         // この分けられた配列の中のIDは1番目の順番にあるところだよと教えている
         $id = $parts[1];
 
-        if ($type === 'ingredient') {
-            $ri = $recipeIngredientRepository->find($id);
-            if ($ri) {
-                $displayItems[] = [
-                    'name' => $ri->getIngredient()->getName(),
-                    'quantity' => $ri->getQuantity(),
-                    'unit' => $ri->getUnit(),
+      if ($type === 'ingredient') {
+        $ri = $recipeIngredientRepository->find($id);
+        if ($ri) {
+            $recipeId = $ri->getRecipe()->getId();
+            $recipeName = $ri->getRecipe()->getName();
+
+            // このレシピIDが、まだ $displayItems に登場していなければ、先に「箱」を作っておく。「からあげ」という引き出し自体が、まだ無ければ
+            if (!isset($displayItems[$recipeId])) {
+            // その引き出し自体を、新しく作る（中には、レシピ名と、まだ空っぽの材料リストを入れる）
+                $displayItems[$recipeId] = [
+                    'recipeName' => $recipeName,
+                    'items' => [],
                 ];
             }
+            // 「からあげ」の引き出しの中の、「材料リスト」という、さらに小さい引き出しに、今処理している1つの材料を、追加する
+            
+            $displayItems[$recipeId]['items'][] = [
+                'name' => $ri->getIngredient()->getName(),
+                'quantity' => $ri->getQuantity(),
+                'unit' => $ri->getUnit(),
+            ];
+        }
         } elseif ($type === 'condiment') {
-            $rc = $recipeCondimentRepository->find($id);
-            if ($rc) {
-                $displayItems[] = [
-                    'name' => $rc->getCondiment()->getName(),
-                    'quantity' => $rc->getQuantity(),
-                    'unit' => $rc->getUnit(),
+        $rc = $recipeCondimentRepository->find($id);
+        if ($rc) {
+            $recipeId = $rc->getRecipe()->getId();
+            $recipeName = $rc->getRecipe()->getName();
+
+            if (!isset($displayItems[$recipeId])) {
+                $displayItems[$recipeId] = [
+                    'recipeName' => $recipeName,
+                    'items' => [],
                 ];
             }
+
+            $displayItems[$recipeId]['items'][] = [
+                'name' => $rc->getCondiment()->getName(),
+                'quantity' => $rc->getQuantity(),
+                'unit' => $rc->getUnit(),
+            ];
         }
     }
+}
+
 
     return $this->render('shopping_list/confirm.html.twig', [
         'displayItems' => $displayItems,

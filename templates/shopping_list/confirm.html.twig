@@ -8,14 +8,18 @@
 
 <h2>選択された内容</h2>
 
-{% for item in displayItems %}
-<div>
-<label>
-<input type="checkbox" value = "{{item.name}}" checked>
-{{item.name}}-{{item.quantity}} {{item.unit}}
-</label>
-
-</div>
+{% for recipeId, group in displayItems %}
+    <h3>{{ group.recipeName }}</h3>
+    <ul>
+        {% for item in group.items %}
+            <li>
+                <label>
+                    <input type="checkbox" value="{{ item.name }}" checked>
+                    {{ item.name }} — {{ item.quantity }} {{ item.unit }}
+                </label>
+            </li>
+        {% endfor %}
+    </ul>
 {% endfor %}
 
 <h2>メモ</h2>
