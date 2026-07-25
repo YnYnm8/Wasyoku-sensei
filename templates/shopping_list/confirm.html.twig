@@ -7,7 +7,23 @@
 <p>MA LISTE DE COURSES</p>
 
 <h2>選択された内容</h2>
-<pre>{{ allData|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+
+{# US6.2 CA1：displayItems は、レシピIDをキーにした、2階層の配列。
+   外側のループで「からあげ」「親子丼」のような、レシピ自体を1つずつ開き、
+   内側のループで、そのレシピに属する材料・調味料を、1つずつ取り出す #}
+{% for recipeId, group in displayItems %}
+    <h3>{{ group.recipeName }}</h3>
+    <ul>
+        {% for item in group.items %}
+            <li>
+                <label>
+                    <input type="checkbox" value="{{ item.name }}" checked>
+                    {{ item.name }} — {{ item.quantity }} {{ item.unit }}
+                </label>
+            </li>
+        {% endfor %}
+    </ul>
+{% endfor %}
 
 <h2>メモ</h2>
 <p>{{ memo }}</p>

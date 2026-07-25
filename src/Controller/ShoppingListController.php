@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use App\Repository\RecipeIngredientRepository;
+use App\Repository\RecipeCondimentRepository;
 
 final class ShoppingListController extends AbstractController
 {
@@ -50,16 +54,83 @@ final class ShoppingListController extends AbstractController
     }
 
 
-    // ③ セッションから、チェック内容・メモを取り出して、確認画面（Image 2相当）を表示する
+   // ③ セッションから、チェック内容・メモを取り出して、確認画面（Image 2相当）を表示する
+    // US6.2 CA1：材料・調味料を、レシピごとにグループ分けして表示するため、
+    // Recipeではなく RecipeIngredient / RecipeCondiment を、IDから直接検索している
     #[Route('/shopping-list/confirm', name: 'app_shopping_list_confirm_show', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function confirmShow(SessionInterface $session): Response
-    {
+    public function confirmShow(
+        SessionInterface $session,
+        RecipeIngredientRepository $recipeIngredientRepository,
+        RecipeCondimentRepository $recipeCondimentRepository
+    ): Response {
+        // セッションに保存しておいた、大きな配列（Twigのinputにこの名前を付けていたため）を、丸ごと取り出す
         $allData = $session->get('shopping_confirm_allData', []);
-        $memo = $session->get('shopping_confirm_memo', '');
+
+        // 「$allDataという配列の中に、'checked_items'というキーが、もし存在すれば、その値を使う。
+        //  もし存在しなければ（nullのような扱いになるので）、代わりに、空の配列[]を使う」
+        // この ?? があることで、何もチェックされなかった場合の、エラーを予防できる
+        $checkedItems = $allData['checked_items'] ?? [];
+        $memo = $allData['memo'] ?? '';
+
+        // レシピIDをキーにして、その中に「レシピ名」と「材料リスト」を持たせる、2階層の配列を、これから組み立てる
+        $displayItems = [];
+
+        foreach ($checkedItems as $item) {
+            // $item が、例えば 'ingredient_70' だったとする。
+            // explode('_', ...) は、「_ という記号の場所で、文字列を切り分けて、配列として返す」関数
+            $parts = explode('_', $item);
+
+            // $parts = ['ingredient', '70'] のような配列になる
+            $type = $parts[0]; // 0番目：種類（'ingredient' か 'condiment'）
+            $id = $parts[1];   // 1番目：ID（数字）
+
+            if ($type === 'ingredient') {
+                $ri = $recipeIngredientRepository->find($id);
+                if ($ri) {
+                    $recipeId = $ri->getRecipe()->getId();
+                    $recipeName = $ri->getRecipe()->getName();
+
+                    // このレシピIDが、まだ $displayItems に登場していなければ、先に「引き出し」を作っておく
+                    // （毎回作り直すと、前に入れた材料が消えてしまうため、isset() で確認してから作る）
+                    if (!isset($displayItems[$recipeId])) {
+                        $displayItems[$recipeId] = [
+                            'recipeName' => $recipeName,
+                            'items' => [],
+                        ];
+                    }
+
+                    // 「からあげ」の引き出しの中の、材料リストに、今処理している1件を追加する
+                    $displayItems[$recipeId]['items'][] = [
+                        'name' => $ri->getIngredient()->getName(),
+                        'quantity' => $ri->getQuantity(),
+                        'unit' => $ri->getUnit(),
+                    ];
+                }
+            } elseif ($type === 'condiment') {
+                $rc = $recipeCondimentRepository->find($id);
+                if ($rc) {
+                    $recipeId = $rc->getRecipe()->getId();
+                    $recipeName = $rc->getRecipe()->getName();
+
+                    if (!isset($displayItems[$recipeId])) {
+                        $displayItems[$recipeId] = [
+                            'recipeName' => $recipeName,
+                            'items' => [],
+                        ];
+                    }
+
+                    $displayItems[$recipeId]['items'][] = [
+                        'name' => $rc->getCondiment()->getName(),
+                        'quantity' => $rc->getQuantity(),
+                        'unit' => $rc->getUnit(),
+                    ];
+                }
+            }
+        }
 
         return $this->render('shopping_list/confirm.html.twig', [
-            'allData' => $allData,
+            'displayItems' => $displayItems,
             'memo' => $memo,
         ]);
     }
@@ -88,5 +159,29 @@ final class ShoppingListController extends AbstractController
         return $this->render('shopping_list/new.html.twig', [
             'favorites' => $favorites,
         ]);
+    }
+
+
+
+    #[Route('/shopping-list/send', name: 'app_shopping_list_send', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function send(
+        Request $request,
+        SessionInterface $session,
+        MailerInterface $mailer
+    ): Response {
+        $emailAddress = $request->request->get('email_address');
+
+        $email = (new Email())
+            ->from('meikotoulouse0726@gmail.com')
+            ->to($emailAddress)
+            ->subject('Votre liste de courses - Wasyoku Sensei')
+            ->text('ここに、買い物リストの中身を書く');
+
+        $mailer->send($email);
+
+        $this->addFlash('shopping_list_sent', true);
+
+        return $this->redirectToRoute('app_shopping_list_confirm_show');
     }
 }
