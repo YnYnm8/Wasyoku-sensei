@@ -7,25 +7,7 @@
 	<h1>私の買い物メモ</h1>
 	<p>MA LISTE DE COURSES</p>
 
-<<<<<<< HEAD
-<h2>選択された内容</h2>
-
-{% for recipeId, group in displayItems %}
-    <h3>{{ group.recipeName }}</h3>
-    <ul>
-        {% for item in group.items %}
-            <li>
-                <label>
-                    <input type="checkbox" value="{{ item.name }}" checked>
-                    {{ item.name }} — {{ item.quantity }} {{ item.unit }}
-                </label>
-            </li>
-        {% endfor %}
-    </ul>
-{% endfor %}
-=======
 	<h2>選択された内容</h2>
->>>>>>> 17-us-62-confirmation-et-envoi
 
 	{# US6.2 CA1：displayItems は、レシピIDをキーにした、2階層の配列。
 	   外側のループで「からあげ」「親子丼」のような、レシピ自体を1つずつ開き、
