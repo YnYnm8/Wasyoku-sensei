@@ -60,6 +60,24 @@
             document.addEventListener('turbo:load', openFavoriDialog);
         </script>
     {% endfor %}
+    {% for sent in app.flashes('shopping_list_sent') %}
+    <dialog id="shopping-list-sent-dialog">
+        <div class="card-popup">
+            <p class="text-center">📧</p>
+            <h3>メールの送信しました</h3>
+            <p>Votre liste de courses a bien été envoyée.</p>
+            <button type="button" onclick="document.getElementById('shopping-list-sent-dialog').close()" class="btn-primary">OK</button>
+        </div>
+    </dialog>
+
+    <script>
+        function openShoppingListSentDialog() {
+            document.getElementById('shopping-list-sent-dialog').showModal();
+        }
+        document.addEventListener('DOMContentLoaded', openShoppingListSentDialog);
+        document.addEventListener('turbo:load', openShoppingListSentDialog);
+    </script>
+{% endfor %}
     <footer>
         <p>和 WASYOKU</p>
         {# これはTwigの機能で、「今日の日付から、年（西暦4桁）だけを取り出す」という意味 #}

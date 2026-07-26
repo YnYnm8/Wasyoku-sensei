@@ -1,30 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Confirmer ma liste{% endblock %}
+{% block title %}Confirmer ma liste
+{% endblock %}
 
 {% block body %}
-<h1>私の買い物メモ</h1>
-<p>MA LISTE DE COURSES</p>
+	<h1>私の買い物メモ</h1>
+	<p>MA LISTE DE COURSES</p>
 
-<h2>選択された内容</h2>
+	<h2>選択された内容</h2>
 
-{# US6.2 CA1：displayItems は、レシピIDをキーにした、2階層の配列。
-   外側のループで「からあげ」「親子丼」のような、レシピ自体を1つずつ開き、
-   内側のループで、そのレシピに属する材料・調味料を、1つずつ取り出す #}
-{% for recipeId, group in displayItems %}
-    <h3>{{ group.recipeName }}</h3>
-    <ul>
-        {% for item in group.items %}
-            <li>
-                <label>
-                    <input type="checkbox" value="{{ item.name }}" checked>
-                    {{ item.name }} — {{ item.quantity }} {{ item.unit }}
-                </label>
-            </li>
-        {% endfor %}
-    </ul>
-{% endfor %}
+	{# US6.2 CA1：displayItems は、レシピIDをキーにした、2階層の配列。
+	   外側のループで「からあげ」「親子丼」のような、レシピ自体を1つずつ開き、
+	   内側のループで、そのレシピに属する材料・調味料を、1つずつ取り出す #}
+	{% for recipeId, group in displayItems %}
+		<h3>{{ group.recipeName }}</h3>
+		<ul>
+			{% for item in group.items %}
+				<li>
+					<label>
+						<input type="checkbox" value="{{ item.name }}" checked>
+						{{ item.name }}
+						—
+						{{ item.quantity }}
+						{{ item.unit }}
+					</label>
+				</li>
+			{% endfor %}
+		</ul>
+	{% endfor %}
 
-<h2>メモ</h2>
-<p>{{ memo }}</p>
+	<h2>メモ</h2>
+	<p>{{ memo }}</p>
+	<form method="post" action="{{ path('app_shopping_list_send') }}">
+    <label>
+        <input type="radio" name="email_choice" value="account" checked>
+        Mail perso
+    </label>
+    <label>
+        <input type="radio" name="email_choice" value="other">
+        Autre adresse mail
+    </label>
+    <input type="email" name="custom_email" placeholder="autre@email.com">
+
+    <button type="submit" class="btn-primary">Envoyer</button>
+</form>
 {% endblock %}

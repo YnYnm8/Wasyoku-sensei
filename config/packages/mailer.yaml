@@ -1,3 +1,6 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+        message_bus: false
+
+        # 「即座に、送信してね」という、明示的な指示を、追加する
