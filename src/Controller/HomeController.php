@@ -4,6 +4,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\RecipeRepository;
+use App\Repository\FavoriteRepository;
 
 final class HomeController extends AbstractController
 {

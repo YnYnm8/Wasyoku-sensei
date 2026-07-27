@@ -26,6 +26,8 @@ class Media
 
     #[ORM\Column(nullable: true)]
     private ?int $stepOrder = null;  // 追加：写真の場合のみ使う（動画では null のまま）
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stepDescription = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
     #[ORM\JoinColumn(nullable: false)]
@@ -85,7 +87,7 @@ class Media
         $this->stepOrder = $stepOrder;
         return $this;
     }
-    
+
     public function getRecipe(): ?Recipe
     {
         return $this->recipe;
@@ -94,6 +96,17 @@ class Media
     public function setRecipe(?Recipe $recipe): static
     {
         $this->recipe = $recipe;
+        return $this;
+    }
+
+    public function getStepDescription(): ?string
+    {
+        return $this->stepDescription;
+    }
+
+    public function setStepDescription(?string $stepDescription): static
+    {
+        $this->stepDescription = $stepDescription;
         return $this;
     }
 }

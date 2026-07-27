@@ -83,7 +83,7 @@ class AppFixtures extends Fixture
         $saucesoja->setComposition('Soja, blé, sel, eau');
         $saucesoja->setUse('Karaage, Oyakodon, Tamagoyaki, Salade de haricots verts au sésame, Hiyayakko, Mapo tofu, Donburi au saumon mariné');
         $saucesoja->setUrl('https://www.amazon.fr/Kikkoman-Sauce-Soja-Flacon-150/dp/B001JTBDM0');
-        $saucesoja->setImageUrl('https://placehold.co/400x300/png?text=Sauce+soja');
+        $saucesoja->setImageUrl('/images/condiments/syo-yu.png');
         $manager->persist($saucesoja);
 
         $sake = new Condiment();
@@ -92,7 +92,7 @@ class AppFixtures extends Fixture
         $sake->setComposition('Riz, koji, eau');
         $sake->setUse('Karaage, Oyakodon, Mapo tofu');
         $sake->setUrl('https://www.amazon.fr/Umami-Sak%C3%A9-pour-cuisiner-500ml/dp/B0B59WD9TM');
-        $sake->setImageUrl('https://placehold.co/400x300/png?text=Sake');
+        $sake->setImageUrl('/images/condiments/sake.png');
         $manager->persist($sake);
         
         $mirin = new Condiment();
@@ -101,7 +101,7 @@ class AppFixtures extends Fixture
         $mirin->setComposition('Riz gluant, koji, alcool de riz');
         $mirin->setUse('Oyakodon, Donburi au saumon mariné');
         $mirin->setUrl('https://www.amazon.fr/Kikkoman-Mirin-cuisine-japonaise-1x750ml/dp/B004XWON0E');
-        $mirin->setImageUrl('https://placehold.co/400x300/png?text=Mirin');
+        $mirin->setImageUrl('/images/condiments/mirin.jpeg');
         $manager->persist($mirin);
         $this->addReference('condiment-mirin', $mirin);
 
@@ -111,7 +111,7 @@ class AppFixtures extends Fixture
         $sucre->setComposition('Canne à sucre ou betterave sucrière');
         $sucre->setUse('Tamagoyaki, Oyakodon, Salade de haricots verts au sésame');
         $sucre->setUrl(null);
-        $sucre->setImageUrl('https://placehold.co/400x300/png?text=Sucre');
+        $sucre->setImageUrl('/images/condiments/sucre.png');
         $manager->persist($sucre);
 
         $sel = new Condiment();
@@ -120,7 +120,7 @@ class AppFixtures extends Fixture
         $sel->setComposition('Chlorure de sodium');
         $sel->setUse('Tamagoyaki');
         $sel->setUrl(null);
-        $sel->setImageUrl('https://placehold.co/400x300/png?text=Sel');
+        $sel->setImageUrl('/images/condiments/sel.png');
         $manager->persist($sel);
 
         $miso = new Condiment();
@@ -129,7 +129,7 @@ class AppFixtures extends Fixture
         $miso->setComposition('Soja, riz, sel, koji');
         $miso->setUse('Mapo tofu');
         $miso->setUrl('https://www.amazon.fr/Hikari-Miso-Rouge-400G/dp/B007GGLV5Y');
-        $miso->setImageUrl('https://placehold.co/400x300/png?text=Miso');
+        $miso->setImageUrl('/images/condiments/miso.png');
         $manager->persist($miso);
 
         $wasabi = new Condiment();
@@ -139,7 +139,7 @@ class AppFixtures extends Fixture
         $wasabi->setUse('Donburi au saumon mariné');
         $wasabi->setNote('Le wasabi authentique (Wasabia japonica) est rare et coûteux ; la plupart des produits vendus en Europe sont des substituts à base de raifort.');
         $wasabi->setUrl('https://www.amazon.fr/P%C3%A2te-wasabi-tube-43g/dp/B09Z6D99BZ');
-        $wasabi->setImageUrl('https://placehold.co/400x300/png?text=Wasabi');
+        $wasabi->setImageUrl('/images/condiments/wasabi.png');
         $manager->persist($wasabi);
 
         
@@ -149,7 +149,7 @@ class AppFixtures extends Fixture
         $dashi->setComposition('Extraits de konbu et/ou katsuobushi, sel');
         $dashi->setUse('Base des soupes, sauces et plats mijotés japonais.');
         $dashi->setUrl('https://www.amazon.fr/Ajinomoto-Hondashi-Bouillon-Poisson-Japonais/dp/B00A2P2ZY0');
-        $dashi->setImageUrl('https://placehold.co/400x300/png?text=Dashi');
+        $dashi->setImageUrl('/images/condiments/dashi.png');
         $manager->persist($dashi);
 
 
@@ -165,7 +165,8 @@ class AppFixtures extends Fixture
 
         $tamagoyaki = new Recipe();
         $tamagoyaki->setName('Tamagoyaki (Omelette japonaise)');
-        $tamagoyaki->setStep('1. Battre les Oeufs avec la sauce soja, le sucre et le sel. 2. Verser une fine couche dans une poêle chaude huilée. 3. Rouler l\'omelette au fur et à mesure de la cuisson en ajoutant de nouvelles couches. 4. Couper en tranches.');
+        $tamagoyaki->setStep('1. Battre les Oeufs avec la sauce soja, le sucre et le sel. 2. Verser une fine couche dans une poêle chaude huilée. 3. Rouler l\'omelette au fur et 
+        à mesure de la cuisson en ajoutant de nouvelles couches. 4. Couper en tranches.');
         $tamagoyaki->setSeason(RecipeSeason::ALL_YEAR);
         $tamagoyaki->setTime('10 min');
         $tamagoyaki->setLevel(RecipeLevel::EASY);
