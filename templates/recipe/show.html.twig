@@ -99,7 +99,7 @@
         <form method="post" action="{{ path('app_favorite_add', {id: recipe.id}) }}">
             <input type="hidden" name="_token" value="{{ csrf_token('add_favorite' ~ recipe.id) }}">
             <input type="hidden" name="person_count" id="person-count-input" value="1">
-            <button type="submit" class="btn-secondary">♡</button>
+            <button type="submit" class="btn-secondary gap-5"> ♡ Ajouter aux favoris</button>
         </form>
     {% endif %}
 {% endif %}
