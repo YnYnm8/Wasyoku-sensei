@@ -1,100 +1,103 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma liste de courses
-{% endblock %}
+{% block title %}Ma liste de courses{% endblock %}
 
 {% block body %}
-	<h1>買い物リスト</h1>
-	<p>LISTES DE COURSES</p>
-	<form method="post" action="{{ path('app_shopping_list_confirm') }}" id="shopping-list-form">
+<div class="p-4">
+    <h1 class="font-display text-2xl">買い物リスト</h1>
+    <p class="text-sm text-gray-500">LISTES DE COURSES</p>
 
-		<p>{{ favorites|length }}
-			RECETTES</p>
-		{# US6.1：セッションに保存されたレシピIDから取得した、Favorite（お気に入り記録）を
-				   1件ずつループする。Recipeだけでなく、その時に選ばれていた人数(person)も
-				   一緒に持っているのが、favoritesを使う理由 #}
-		{% for favorite in favorites %}
-			{# {% set %} で、favorite.recipe を毎回書かずに済むよう、短い名前を付けておく #}
-			{% set recipe = favorite.recipe %}
-			<div>
-				<h3>{{ recipe.name }}</h3>
+    <form method="post" action="{{ path('app_shopping_list_confirm') }}" id="shopping-list-form">
 
-				{# US6.1 CA2：人数はお気に入り登録時の値が初期値。この画面でも+/-ボタンで変更できる
-								           id にレシピIDを含めているのは、複数レシピが同じ画面に並ぶため、
-								           JSがどのレシピのボタンか区別できるようにするため #}
-				<div>
-					<button id="decrease-btn-{{ recipe.id }}" type="button" data-recipe-id="{{ recipe.id }}">−</button>
-					<span id="person-count-{{ recipe.id }}">{{ favorite.person }}</span>
-					<button id="increase-btn-{{ recipe.id }}" type="button" data-recipe-id="{{ recipe.id }}">＋</button>
-				</div>
+        <span class="inline-block bg-washoku-red text-white text-sm px-3 py-1 rounded-full mt-2">{{ favorites|length }} RECETTES</span>
 
-				{# US6.1 CA3・CA4：材料は、レシピをまたいで合算せず、レシピごとに分けて表示する #}
-				<h4>材料</h4>
-				<ul>
-					{% for ri in recipe.recipeIngredients %}
-						{# data-base-quantity・data-recipe-id は、後でJSが「どの材料を、どのレシピの人数で」
-												                   再計算すればいいかを判断するための目印 #}
-						<li
-							data-base-quantity="{{ ri.quantity }}" data-recipe-id="{{ recipe.id }}">
-							{# US6.1 CA5：チェックを外せば、このアイテムを最終的なリストから除外できる #}
-							<input type="checkbox" name="checked_items[]" value="ingredient_{{ ri.id }}"checked>
-							{{ ri.ingredient.name }}
-							<span class="quantity">{{ ri.quantity }}</span>
-							{{ ri.unit }}
-						</li>
-					{% endfor %}
-				</ul>
+        {# US6.1：セッションに保存されたレシピIDから取得した、Favorite（お気に入り記録）を
+           1件ずつループする。Recipeだけでなく、その時に選ばれていた人数(person)も
+           一緒に持っているのが、favoritesを使う理由 #}
+        {% for favorite in favorites %}
+            {# {% set %} で、favorite.recipe を毎回書かずに済むよう、短い名前を付けておく #}
+            {% set recipe = favorite.recipe %}
+            <div class="card-popup !max-w-none !mx-0 my-4">
+                {% set photo = recipe.media|first %}
+                <div class="flex items-center gap-3">
+                    {% if photo %}
+                        <img src="{{ photo.url }}" alt="{{ recipe.name }}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+                    {% endif %}
+                    <h3 class="font-display text-lg">{{ recipe.name }}</h3>
+                </div>
 
-				<h4>調味料</h4>
-				<ul>
-					{% for rc in recipe.recipeCondiments %}
-						<li data-base-quantity="{{ rc.quantity }}" data-recipe-id="{{ recipe.id }}">
-							<input type="checkbox" name="checked_items[]" value="condiment_{{ rc.id }}" checked>
-							{{ rc.condiment.name }}
-							<span class="quantity">{{ rc.quantity }}</span>
-							{{ rc.unit }}
+                {# US6.1 CA2：人数はお気に入り登録時の値が初期値。この画面でも+/-ボタンで変更できる
+                   id にレシピIDを含めているのは、複数レシピが同じ画面に並ぶため、
+                   JSがどのレシピのボタンか区別できるようにするため #}
+                <div class="flex items-center gap-3 bg-white rounded-2xl shadow p-3 my-4 w-fit">
+                    <button id="decrease-btn-{{ recipe.id }}" type="button" data-recipe-id="{{ recipe.id }}" class="w-10 h-10 rounded-full border border-washoku-beige flex items-center justify-center">−</button>
+                    <span id="person-count-{{ recipe.id }}" class="text-xl w-8 text-center">{{ favorite.person }}</span>
+                    <button id="increase-btn-{{ recipe.id }}" type="button" data-recipe-id="{{ recipe.id }}" class="btn-icon-round">＋</button>
+                </div>
 
-							{# US6.1 CA7：代替品は、選択用のチェックボックスは付けず、
-														                       あくまで参考情報（メモ的な位置づけ）として表示するだけにする。
-														                       US3.3で既に作った代替品データを、そのまま再利用している #}
-							{% if rc.condiment.condimentSubstituteGroups|length > 0 %}
-								<p>
-									<small>
-										※ Substitut possible :
-										{% for group in rc.condiment.condimentSubstituteGroups %}
-											{% for substitute in group.condimentSubstitutes %}
-												{{ substitute.name }}
-												{{ substitute.quantity }}{{ substitute.unit }}
-												{% if not loop.last %}
-													+
-												{% endif %}
-											{% endfor %}
-										{% endfor %}
-									</small>
-								</p>
-							{% endif %}
-						</li>
-					{% endfor %}
-				</ul>
+                {# US6.1 CA3・CA4：材料は、レシピをまたいで合算せず、レシピごとに分けて表示する #}
+                <h4 class="text-sm text-gray-500 mt-4">材料</h4>
+                <ul>
+                    {% for ri in recipe.recipeIngredients %}
+                        {# data-base-quantity・data-recipe-id は、後でJSが「どの材料を、どのレシピの人数で」
+                           再計算すればいいかを判断するための目印 #}
+                        <li data-base-quantity="{{ ri.quantity }}" data-recipe-id="{{ recipe.id }}" class="flex items-center gap-2 py-2 border-b border-washoku-beige">
+                            {# US6.1 CA5：チェックを外せば、このアイテムを最終的なリストから除外できる #}
+                            <input type="checkbox" name="checked_items[]" value="ingredient_{{ ri.id }}" checked>
+                            <span class="flex-1">{{ ri.ingredient.name }}</span>
+                            <span class="quantity font-semibold text-washoku-red">{{ ri.quantity }}</span>
+                            <span class="font-semibold text-washoku-red">{{ ri.unit }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
 
-				{# US6.1 CA8：チェックすると、このレシピの作り方（step）が、
-								           最終的な確認メールに一緒に添付される（US6.2で処理） #}
-				<label>
-					<input type="checkbox" name="include_recipe_{{ recipe.id }}">
-					Inclure la recette
-				</label>
-			</div>
-		{% endfor %}
+                <h4 class="text-sm text-gray-500 mt-4">調味料</h4>
+                <ul>
+                    {% for rc in recipe.recipeCondiments %}
+                        <li data-base-quantity="{{ rc.quantity }}" data-recipe-id="{{ recipe.id }}" class="py-2 border-b border-washoku-beige">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" name="checked_items[]" value="condiment_{{ rc.id }}" checked>
+                                <span class="flex-1">{{ rc.condiment.name }}</span>
+                                <span class="quantity font-semibold text-washoku-red">{{ rc.quantity }}</span>
+                                <span class="font-semibold text-washoku-red">{{ rc.unit }}</span>
+                            </div>
 
-		{# US6.1 CA6：レシピに含まれない、日用品などを自由入力で追加できるメモ欄 #}
-		<div>
-			<h2>メモを追加</h2>
-			<p>AJOUTER UN MEMO</p>
-			<textarea name = 'memo' placeholder="Article, produit..."></textarea>
-		</div>
+                            {# US6.1 CA7：代替品は、選択用のチェックボックスは付けず、
+                               あくまで参考情報（メモ的な位置づけ）として表示するだけにする。
+                               US3.3で既に作った代替品データを、そのまま再利用している #}
+                            {% if rc.condiment.condimentSubstituteGroups|length > 0 %}
+                                <p class="text-xs text-orange-600 mt-1 ml-6">
+                                    ※ Substitut possible :
+                                    {% for group in rc.condiment.condimentSubstituteGroups %}
+                                        {% for substitute in group.condimentSubstitutes %}
+                                            {{ substitute.name }} {{ substitute.quantity }}{{ substitute.unit }}{% if not loop.last %} + {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
 
-		<button type="submit" class="btn-primary">
-			Valider ma liste
-		</button>
-	</form>
+                {# US6.1 CA8：チェックすると、このレシピの作り方（step）が、
+                   最終的な確認メールに一緒に添付される（US6.2で処理） #}
+                <label class="flex items-center gap-2 mt-4 text-sm">
+                    <input type="checkbox" name="include_recipe_{{ recipe.id }}">
+                    Inclure la recette
+                </label>
+            </div>
+        {% endfor %}
+
+        {# US6.1 CA6：レシピに含まれない、日用品などを自由入力で追加できるメモ欄 #}
+        <div class="card-popup !max-w-none !mx-0 my-4">
+            <h2 class="font-display text-lg">メモを追加</h2>
+            <p class="text-sm text-gray-500">AJOUTER UN MEMO</p>
+            <textarea name="memo" placeholder="Article, produit..." class="w-full border border-washoku-beige rounded-lg p-3 mt-2 h-24"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Valider ma liste
+        </button>
+    </form>
+</div>
 {% endblock %}

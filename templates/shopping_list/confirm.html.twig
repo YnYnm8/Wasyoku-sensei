@@ -1,47 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Confirmer ma liste
-{% endblock %}
+{% block title %}Confirmer ma liste{% endblock %}
 
 {% block body %}
-	<h1>私の買い物メモ</h1>
-	<p>MA LISTE DE COURSES</p>
+<div class="p-4">
+    <h1 class="font-display text-2xl">私の買い物メモ</h1>
+    <p class="text-sm text-gray-500">MA LISTE DE COURSES</p>
 
-	<h2>選択された内容</h2>
+    {# US6.2 CA1：displayItems は、レシピIDをキーにした、2階層の配列。
+       外側のループで「からあげ」「親子丼」のような、レシピ自体を1つずつ開き、
+       内側のループで、そのレシピに属する材料・調味料を、1つずつ取り出す #}
+    <div class="card-popup !max-w-none !mx-0 my-4">
+        <div class="flex items-center justify-between">
+            <span class="font-display text-lg">{{ displayItems|length }}品目</span>
+            <span class="w-4 h-4 bg-washoku-red"></span>
+        </div>
+        <p class="text-sm text-gray-500">ARTICLE COMPLETE</p>
 
-	{# US6.2 CA1：displayItems は、レシピIDをキーにした、2階層の配列。
-	   外側のループで「からあげ」「親子丼」のような、レシピ自体を1つずつ開き、
-	   内側のループで、そのレシピに属する材料・調味料を、1つずつ取り出す #}
-	{% for recipeId, group in displayItems %}
-		<h3>{{ group.recipeName }}</h3>
-		<ul>
-			{% for item in group.items %}
-				<li>
-					<label>
-						<input type="checkbox" value="{{ item.name }}" checked>
-						{{ item.name }}
-						—
-						{{ item.quantity }}
-						{{ item.unit }}
-					</label>
-				</li>
-			{% endfor %}
-		</ul>
-	{% endfor %}
+      <div class="mt-4">
+    {% for recipeId, group in displayItems %}
+        <h3 class="font-display text-base mt-4 mb-1">{{ group.recipeName }}</h3>
+        {% for item in group.items %}
+            <label class="flex items-center gap-2 py-2 border-b border-washoku-beige">
+                <input type="checkbox" value="{{ item.name }}" checked class="accent-washoku-red">
+                <span class="flex-1">{{ item.name }}</span>
+                <span class="font-semibold text-washoku-red">{{ item.quantity }} {{ item.unit }}</span>
+            </label>
+        {% endfor %}
+    {% endfor %}
+</div>
+    </div>
 
-	<h2>メモ</h2>
-	<p>{{ memo }}</p>
-	<form method="post" action="{{ path('app_shopping_list_send') }}">
-    <label>
-        <input type="radio" name="email_choice" value="account" checked>
-        Mail perso
-    </label>
-    <label>
-        <input type="radio" name="email_choice" value="other">
-        Autre adresse mail
-    </label>
-    <input type="email" name="custom_email" placeholder="autre@email.com">
+    {% if memo %}
+        <div class="card-popup !max-w-none !mx-0 my-4">
+            <h2 class="font-display text-lg">メモ</h2>
+            <p class="mt-2">{{ memo }}</p>
+        </div>
+    {% endif %}
 
-    <button type="submit" class="btn-primary">Envoyer</button>
-</form>
+    <a href="{{ path('app_shopping_list_new') }}" class="btn-secondary block text-center my-4">Annuler</a>
+
+    <form method="post" action="{{ path('app_shopping_list_send') }}" class="mt-4">
+        <label class="flex items-center gap-2 py-2">
+            <input type="radio" name="email_choice" value="account" checked class="accent-washoku-red">
+            <span>Mail perso</span>
+        </label>
+        <label class="flex items-center gap-2 py-2">
+            <input type="radio" name="email_choice" value="other" class="accent-washoku-red">
+            <span>Autre adresse mail</span>
+        </label>
+        <input type="email" name="custom_email" placeholder="autre@email.com" class="w-full border border-washoku-beige rounded-lg p-3 mt-2">
+
+        <button type="submit" class="btn-primary mt-4">Envoyer</button>
+    </form>
+</div>
 {% endblock %}
