@@ -1,45 +1,51 @@
 {% extends 'base.html.twig' %}
-{% block title %}Log in!
-{% endblock %}
+{% block title %}Log in!{% endblock %}
 {% block body %}
-	<div class="min-h-screen bg-washoku-bg relative flex items-center justify-center px-4">
+<div class="min-h-screen bg-washoku-bg relative flex items-center justify-center px-4">
 
-		<div class="absolute inset-0 opacity-10" style="background-image: url('{{ asset('images/seigaiha-blue.svg') }}'); background-repeat: repeat;"></div>
+    <div class="absolute inset-0 opacity-10" style="background-image: url('{{ asset('images/seigaiha-blue.svg') }}'); background-repeat: repeat;"></div>
 
-		<form method="post" class="relative z-10 w-full max-w-sm bg-washoku-input/90 border border-washoku-beige/20 rounded-2xl p-6 space-y-3">
-			<div class="relative h-28 -m-6 mb-6 border-b border-washoku-beige/20 flex items-center justify-center gap-3">
-				<span class="vertical-text text-xs text-washoku-red/70">日本の味を自宅で</span>
-				<h1 class="font-display text-2xl tracking-normal">和食先生</h1>
-			</div>
-			{% if error %}
-				<div class="mb-3 text-sm text-red-600 bg-red-50 border border-red-300 rounded-lg px-3 py-2">
-					{{ error.messageKey|trans(error.messageData, 'security') }}
-				</div>
-			{% endif %}
-            
-			{% if app.user %}
-				<div class="mb-3">
-					You are logged in as
-					{{ app.user.userIdentifier }},
-					<a href="{{ logout_path() }}">Logout</a>
-				</div>
-			{% endif %}
-			<h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-			<label for="inputEmail">Email</label>
-			<input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-			<label for="inputPassword">Password</label>
-			<input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-			<input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
-			<div class="checkbox mb-3">
-				<label>
-					<input type="checkbox" name="_remember_me">
-					Remember me
-				</label>
-			</div>
-			<button class="btn btn-lg btn-primary" type="submit">
-				Sign in
-			</button>
-		</form>
+    <form method="post" class="relative z-10 w-full max-w-sm bg-washoku-input/90 rounded-2xl p-6 space-y-3">
+        <div class="relative h-40 -m-6 mb-6 border-b border-washoku-beige/20 flex items-center justify-center gap-8">
+            <span class="vertical-text text-sm text-washoku-yellow">日本の味を自宅で</span>
+            <h1 class="font-display text-3xl tracking-normal text-washoku-red">和食先生</h1>
+        </div>
 
-	</div>
+        {% if error %}
+            <div class="mb-3 text-sm text-red-600 bg-red-50 border border-red-300 rounded-lg px-3 py-2">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="mb-3 text-white text-sm">
+                You are logged in as {{ app.user.userIdentifier }},
+                <a href="{{ logout_path() }}" class="text-washoku-red">Logout</a>
+            </div>
+        {% endif %}
+
+        <p class="font-display text-white text-lg font-semibold">Connexion</p>
+        <p class="text-washoku-inputtext text-xs mb-4">ログイン</p>
+
+        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext" placeholder="Email" autocomplete="email" required autofocus>
+
+        <input type="password" name="password" id="inputPassword" class="w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext mt-3" placeholder="Mot de passe" autocomplete="current-password" required>
+
+        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+        <label class="flex items-center gap-2 text-xs text-washoku-inputtext mt-3">
+            <input type="checkbox" name="_remember_me">
+            Se souvenir de moi
+        </label>
+
+        <button class="btn-primary mt-4 font-display" type="submit">
+            Se connecter
+        </button>
+
+        <p class="text-center text-xs text-washoku-inputtext mt-3">
+            Pas encore de compte ? <a href="{{ path('app_register') }}" class="text-washoku-red">Inscris-toi</a>
+        </p>
+    </form>
+
+</div>
 {% endblock %}

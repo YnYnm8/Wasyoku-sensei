@@ -3,18 +3,41 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+<div class="min-h-screen bg-washoku-bg relative flex items-center justify-center px-4">
 
-    {{ form_errors(registrationForm) }}
+    <div class="absolute inset-0 opacity-10" style="background-image: url('{{ asset('images/seigaiha-blue.svg') }}'); background-repeat: repeat;"></div>
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.username) }}  
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+    {{ form_start(registrationForm, {'attr': {'class': 'relative z-10 w-full max-w-sm bg-washoku-input/90 rounded-2xl p-6 space-y-3'}}) }}
 
-        <button type="submit" class="btn">Register</button>
+        <div class="relative h-40 -m-6 mb-6 border-b border-washoku-beige/20 flex items-center justify-center gap-8">
+            <span class="vertical-text text-sm text-washoku-yellow">日本の味を自宅で</span>
+           <h1 class="font-display text-3xl tracking-normal text-washoku-red">和食先生</h1>
+        </div>
+
+        <p class="font-display text-white text-lg font-semibold">Créer un compte</p>
+        <p class="text-washoku-inputtext text-xs mb-4">アカウント作成</p>
+
+        {{ form_errors(registrationForm) }}
+
+        {{ form_widget(registrationForm.username, {'attr': {'class': 'w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext', 'placeholder': 'Nom d\'utilisateur'}}) }}
+
+        {{ form_widget(registrationForm.email.first, {'attr': {'class': 'w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext mt-3', 'placeholder': 'Email'}}) }}
+        {{ form_widget(registrationForm.email.second, {'attr': {'class': 'w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext mt-3', 'placeholder': 'Confirmer l\'email'}}) }}
+
+        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext mt-3', 'placeholder': 'Mot de passe'}}) }}
+        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext mt-3', 'placeholder': 'Confirmer le mot de passe'}}) }}
+
+        <label class="flex items-center gap-2 text-xs text-washoku-inputtext mt-3">
+            {{ form_widget(registrationForm.agreeTerms) }}
+            J'accepte les conditions
+        </label>
+
+        <button type="submit" class="btn-primary mt-4 font-display">S'inscrire</button>
+
+        <p class="text-center text-xs text-washoku-inputtext mt-3">
+            Déjà inscrit ? <a href="{{ path('app_login') }}" class="text-washoku-red">Connecte-toi</a>
+        </p>
+
     {{ form_end(registrationForm) }}
+</div>
 {% endblock %}
