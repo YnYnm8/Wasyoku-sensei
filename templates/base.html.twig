@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
         {% block title %}Welcome!{% endblock %}
     </title>
@@ -16,17 +17,15 @@
     {% endblock %}
 </head>
 <body>
+{% block header %}
 <header class="bg-washoku-bg text-washoku-cream px-6 py-6">
     <nav class="flex items-center justify-between">
         <a href="{{ path('app_home') }}" class="font-display text-2xl">Wasyoku Sensei</a>
-
-        {% if is_granted('ROLE_ADMIN') %}
-            <div class="flex items-center gap-4">
-                <span class="text-washoku-inputtext text-sm">Admin</span>
-                <a href="{{ path('app_recipe_index') }}" class="text-base hover:text-washoku-red transition">Recettes</a>
-                <a href="{{ path('app_condiment_index') }}" class="text-base hover:text-washoku-red transition">Condiments</a>
-            </div>
-        {% endif %}
+{% if is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('app_recipe_admin_index') }}" class="text-base hover:text-washoku-red transition">
+        Admin
+    </a>
+{% endif %}
 
         {% if app.user %}
             <a href="{{ path('app_favorite_index') }}" class="text-base hover:text-washoku-red transition">Mes favoris</a>
@@ -35,6 +34,7 @@
         {% endif %}
     </nav>
 </header>
+{% endblock %}
     {% block body %}{% endblock %}
 
     {% for favori in app.flashes('favori_added') %}

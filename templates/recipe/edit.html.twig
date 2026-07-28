@@ -1,103 +1,215 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
+{% set active_tab = 'recipes' %}
 
 {% block title %}Edit Recipe{% endblock %}
 
-{% block body %}
-<h1>Edit Recipe</h1>
+{% block admin_breadcrumb %}
+    <a href="{{ path('app_recipe_index') }}" class="text-washoku-inputtext hover:text-white text-sm">
+        ‹ レシピ編集
+    </a>
+    <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">/admin/recipes/{{ recipe.id }}/edit</p>
+{% endblock %}
 
-{{ include('recipe/_form.html.twig', {'button_label': 'Update'}) }}
+{% block admin_body %}
 
-<div>
-    <h2>Ingrédients</h2>
-    <ul>
-        {% for ri in recipe.recipeIngredients %}
-            <li>
-                {{ ri.ingredient.name }} — {{ ri.quantity }} {{ ri.unit }}
-                <form method="post" action="{{ path('app_recipe_ingredient_delete', {id: recipe.id, recipeIngredientId: ri.id}) }}" style="display:inline">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete_ingredient' ~ ri.id) }}">
-                    <button type="submit" onclick="return confirm('Retirer cet ingrédient ?')">Retirer</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
+    {# ---------- 基本情報 ---------- #}
+    <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
+        <h2 class="font-display text-lg mb-4">基本情報・Informations</h2>
+        {{ include('recipe/_form.html.twig', {'button_label': '基本情報を保存'}) }}
+    </div>
 
-    <button type="button" onclick="document.getElementById('add-ingredient-dialog').showModal()">
-        + Ajouter un ingrédient
-    </button>
+    {# ---------- 材料 ---------- #}
+    <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display text-lg">材料一覧・Ingrédients</h2>
+            <button type="button" onclick="document.getElementById('add-ingredient-dialog').showModal()" class="btn-icon-round text-sm">+</button>
+        </div>
 
-    <dialog id="add-ingredient-dialog">
-        <form method="post" action="{{ path('app_recipe_ingredient_add', {id: recipe.id}) }}">
-            <label>
-                Ingrédient
-                <input type="text" name="ingredient_name" list="ingredient-list" required>
-            </label>
-            <datalist id="ingredient-list">
-                {% for ingredient in ingredients %}
-                    <option value="{{ ingredient.name }}"></option>
-                {% endfor %}
-            </datalist>
+        <ul class="space-y-2">
+            {% for ri in recipe.recipeIngredients %}
+                <li class="flex items-center justify-between bg-washoku-beige/40 rounded-lg px-3 py-2">
+                    <span class="text-sm text-gray-700">{{ ri.ingredient.name }} — {{ ri.quantity }} {{ ri.unit }}</span>
+                    <form method="post" action="{{ path('app_recipe_ingredient_delete', {id: recipe.id, recipeIngredientId: ri.id}) }}" style="display:inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_ingredient' ~ ri.id) }}">
+                        <button type="submit" onclick="return confirm('Retirer cet ingrédient ?')" class="text-washoku-red hover:text-washoku-redhover text-sm font-semibold">削除</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
 
-            <label>
-                Quantité
-                <input type="number" step="0.1" name="quantity" required>
-            </label>
+        <button type="button" onclick="document.getElementById('add-ingredient-dialog').showModal()" class="btn-secondary mt-4">
+            + 材料を追加・Ajouter un ingrédient
+        </button>
+    </div>
 
-            <label>
-                Unité
-                <input type="text" name="unit" required>
-            </label>
-
-            <button type="submit" class="btn-primary">Ajouter</button>
-            <button type="button" onclick="document.getElementById('add-ingredient-dialog').close()" class="btn-secondary">Annuler</button>
+    <dialog id="add-ingredient-dialog" class="card-popup">
+        <form method="post" action="{{ path('app_recipe_ingredient_add', {id: recipe.id}) }}" class="space-y-4">
+            <div>
+                <label class="block font-display text-sm mb-1">材料名・Ingrédient</label>
+                <input type="text" name="ingredient_name" list="ingredient-list" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+                <datalist id="ingredient-list">
+                    {% for ingredient in ingredients %}
+                        <option value="{{ ingredient.name }}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+            <div>
+                <label class="block font-display text-sm mb-1">分量・Quantité</label>
+                <input type="number" step="0.1" name="quantity" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+            <div>
+                <label class="block font-display text-sm mb-1">単位・Unité</label>
+                <input type="text" name="unit" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary">追加する・Ajouter</button>
+                <button type="button" onclick="document.getElementById('add-ingredient-dialog').close()" class="btn-secondary">キャンセル</button>
+            </div>
         </form>
     </dialog>
 
-    <h2>Condiments</h2>
-    <ul>
-        {% for rc in recipe.recipeCondiments %}
-            <li>
-                {{ rc.condiment.name }} — {{ rc.quantity }} {{ rc.unit }}
-                <form method="post" action="{{ path('app_recipe_condiment_delete', {id: recipe.id, recipeCondimentId: rc.id}) }}" style="display:inline">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete_condiment' ~ rc.id) }}">
-                    <button type="submit" onclick="return confirm('Retirer ce condiment ?')">Retirer</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
+    {# ---------- 調味料 ---------- #}
+    <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display text-lg">調味料一覧・Condiments</h2>
+            <button type="button" onclick="document.getElementById('add-condiment-dialog').showModal()" class="btn-icon-round text-sm">+</button>
+        </div>
 
-    <button type="button" onclick="document.getElementById('add-condiment-dialog').showModal()">
-        + Ajouter un condiment
-    </button>
+        <ul class="space-y-2">
+            {% for rc in recipe.recipeCondiments %}
+                <li class="flex items-center justify-between bg-washoku-beige/40 rounded-lg px-3 py-2">
+                    <span class="text-sm text-gray-700">{{ rc.condiment.name }} — {{ rc.quantity }} {{ rc.unit }}</span>
+                    <form method="post" action="{{ path('app_recipe_condiment_delete', {id: recipe.id, recipeCondimentId: rc.id}) }}" style="display:inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_condiment' ~ rc.id) }}">
+                        <button type="submit" onclick="return confirm('Retirer ce condiment ?')" class="text-washoku-red hover:text-washoku-redhover text-sm font-semibold">削除</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
 
-    <dialog id="add-condiment-dialog">
-        <form method="post" action="{{ path('app_recipe_condiment_add', {id: recipe.id}) }}">
-            <label>
-                Condiment
-                <select name="condiment_id" required>
-                    <option value="">-- Choisir --</option>
+        <button type="button" onclick="document.getElementById('add-condiment-dialog').showModal()" class="btn-secondary mt-4">
+            + 調味料を追加・Ajouter un condiment
+        </button>
+    </div>
+
+    <dialog id="add-condiment-dialog" class="card-popup">
+        <form method="post" action="{{ path('app_recipe_condiment_add', {id: recipe.id}) }}" class="space-y-4">
+            <div>
+                <label class="block font-display text-sm mb-1">調味料・Condiment</label>
+                <select name="condiment_id" required class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+                    <option value="">-- 選択・Choisir --</option>
                     {% for condiment in condiments %}
                         <option value="{{ condiment.id }}">{{ condiment.name }}</option>
                     {% endfor %}
                 </select>
-            </label>
-
-            <label>
-                Quantité
-                <input type="number" step="0.1" name="quantity" required>
-            </label>
-
-            <label>
-                Unité
-                <input type="text" name="unit" required>
-            </label>
-
-            <button type="submit" class="btn-primary">Ajouter</button>
-            <button type="button" onclick="document.getElementById('add-condiment-dialog').close()" class="btn-secondary">Annuler</button>
+            </div>
+            <div>
+                <label class="block font-display text-sm mb-1">分量・Quantité</label>
+                <input type="number" step="0.1" name="quantity" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+            <div>
+                <label class="block font-display text-sm mb-1">単位・Unité</label>
+                <input type="text" name="unit" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary">追加する・Ajouter</button>
+                <button type="button" onclick="document.getElementById('add-condiment-dialog').close()" class="btn-secondary">キャンセル</button>
+            </div>
         </form>
     </dialog>
-</div>
 
-<a href="{{ path('app_recipe_index') }}">back to list</a>
+    {# ---------- メイン写真 ---------- #}
+    <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display text-lg">メイン写真</h2>
+            <button type="button" onclick="document.getElementById('add-main-photo-dialog').showModal()" class="btn-icon-round text-sm">+</button>
+        </div>
 
-{{ include('recipe/_delete_form.html.twig') }}
+        <ul class="space-y-3">
+            {% for media in recipe.media|filter(m => m.stepOrder is null) %}
+                <li class="flex items-center gap-3 bg-washoku-beige/40 rounded-lg px-3 py-2">
+                    <img src="{{ media.url }}" alt="{{ media.name }}" class="w-16 h-16 object-cover rounded-md">
+                    <form method="post" action="{{ path('app_recipe_media_delete', {id: recipe.id, mediaId: media.id}) }}" style="display:inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_media' ~ media.id) }}">
+                        <button type="submit" onclick="return confirm('Retirer cette photo ?')" class="text-washoku-red hover:text-washoku-redhover text-sm font-semibold">削除</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <button type="button" onclick="document.getElementById('add-main-photo-dialog').showModal()" class="btn-secondary mt-4">
+            + 写真を追加・Ajouter une photo principale
+        </button>
+    </div>
+
+    <dialog id="add-main-photo-dialog" class="card-popup">
+        <form method="post" action="{{ path('app_recipe_main_photo_add', {id: recipe.id}) }}" class="space-y-4">
+            <div>
+                <label class="block font-display text-sm mb-1">画像URL・URL de l'image</label>
+                <input type="url" name="url" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary">追加する・Ajouter</button>
+                <button type="button" onclick="document.getElementById('add-main-photo-dialog').close()" class="btn-secondary">キャンセル</button>
+            </div>
+        </form>
+    </dialog>
+
+    {# ---------- 作り方 ---------- #}
+    <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display text-lg">作り方・Préparation</h2>
+            <button type="button" onclick="document.getElementById('add-step-dialog').showModal()" class="btn-icon-round text-sm">+</button>
+        </div>
+
+        <ol class="space-y-3">
+            {% for media in recipe.media|filter(m => m.stepOrder is not null)|sort((a, b) => a.stepOrder <=> b.stepOrder) %}
+                <li class="flex items-start gap-3 bg-washoku-beige/40 rounded-lg px-3 py-2">
+                    <span class="font-display text-washoku-red text-lg w-8">{{ '%02d'|format(loop.index) }}</span>
+                    <img src="{{ media.url }}" alt="" class="w-16 h-16 object-cover rounded-md">
+                    <p class="text-sm text-gray-700 flex-1">{{ media.stepDescription }}</p>
+                    <form method="post" action="{{ path('app_recipe_media_delete', {id: recipe.id, mediaId: media.id}) }}" style="display:inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_media' ~ media.id) }}">
+                        <button type="submit" onclick="return confirm('Retirer cette étape ?')" class="text-washoku-red hover:text-washoku-redhover text-sm font-semibold">削除</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ol>
+
+        <button type="button" onclick="document.getElementById('add-step-dialog').showModal()" class="btn-secondary mt-4">
+            + ステップを追加・Ajouter une étape
+        </button>
+    </div>
+
+    <dialog id="add-step-dialog" class="card-popup">
+        <form method="post" action="{{ path('app_recipe_step_add', {id: recipe.id}) }}" class="space-y-4">
+            <div>
+                <label class="block font-display text-sm mb-1">画像URL・URL de l'étape</label>
+                <input type="url" name="url" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+            <div>
+                <label class="block font-display text-sm mb-1">説明・Description</label>
+                <input type="text" name="step_description" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary">追加する・Ajouter</button>
+                <button type="button" onclick="document.getElementById('add-step-dialog').close()" class="btn-secondary">キャンセル</button>
+            </div>
+        </form>
+    </dialog>
+
+    {# ---------- 一覧に戻る・削除 ---------- #}
+    <div class="flex items-center gap-4 mt-6">
+        <a href="{{ path('app_recipe_admin_index') }}" class="text-washoku-inputtext hover:text-white text-sm">← レシピ一覧に戻る</a>
+        {{ include('recipe/_delete_form.html.twig') }}
+    </div>
+
 {% endblock %}

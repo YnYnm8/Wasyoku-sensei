@@ -1,0 +1,57 @@
+{% extends 'admin/base.html.twig' %}
+{% set active_tab = 'recipes' %}
+
+{% block title %}レシピ管理{% endblock %}
+
+{% block admin_breadcrumb %}
+    <h2 class="font-display text-lg">レシピ管理</h2>
+    <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Gestion des recettes</p>
+{% endblock %}
+
+{% block admin_body %}
+
+    <div class="mb-6">
+        <a href="{{ path('app_recipe_new') }}" class="btn-primary max-w-sm lg:max-w-xs inline-block text-center">
+            + 新しいレシピを追加・Ajouter une nouvelle recette
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {% for recipe in recipes %}
+            <div class="card-popup max-w-sm lg:max-w-none w-full flex gap-4 items-center lg:flex-col lg:items-start">
+
+                {% set mainPhoto = recipe.media|filter(m => m.stepOrder is null)|first %}
+                <div class="w-20 h-20 lg:w-full lg:h-40 rounded-lg overflow-hidden bg-washoku-beige flex-shrink-0">
+                    {% if mainPhoto %}
+                        <img src="{{ mainPhoto.url }}" alt="{{ recipe.name }}" class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+
+                <div class="flex-1">
+                    <h3 class="font-display text-lg text-gray-800">{{ recipe.name }}</h3>
+                    <p class="text-xs text-gray-500 mt-1">
+                        ⏱ {{ recipe.time }} min · {{ recipe.level.label }} · {{ recipe.mainCategory.label }}
+                    </p>
+
+                    <div class="flex gap-2 mt-3">
+                        <a href="{{ path('app_recipe_edit', {id: recipe.id}) }}"
+                           class="px-3 py-1.5 rounded-lg text-sm bg-washoku-beige text-gray-700 hover:opacity-80 transition">
+                            編集・Éditer
+                        </a>
+                        <form method="post" action="{{ path('app_recipe_delete', {id: recipe.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ recipe.id) }}">
+                            <button type="submit"
+                                    onclick="return confirm('このレシピを削除しますか？')"
+                                    class="px-3 py-1.5 rounded-lg text-sm bg-washoku-red/10 text-washoku-red hover:bg-washoku-red/20 transition">
+                                削除・Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-washoku-inputtext">まだレシピがありません。</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}

@@ -1,4 +1,68 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+
+    <div>
+        <label class="block font-display text-sm mb-1">名前・Nom</label>
+        {{ form_widget(form.name, {
+            'attr': {
+                'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white',
+                'placeholder': '例：ラーメン'
+            }
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">説明・Description</label>
+        {{ form_widget(form.description, {
+            'attr': {
+                'rows': 3,
+                'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'
+            }
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">作り方・Étapes</label>
+        {{ form_widget(form.step, {
+            'attr': {
+                'rows': 4,
+                'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white',
+                'placeholder': '作り方を入力...'
+            }
+        }) }}
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block font-display text-sm mb-1">季節・Saison</label>
+            {{ form_widget(form.season, {
+                'attr': {'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+            }) }}
+        </div>
+        <div>
+            <label class="block font-display text-sm mb-1">時間（min）・Temps</label>
+            {{ form_widget(form.time, {
+                'attr': {'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+            }) }}
+        </div>
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">難易度・Niveau</label>
+        {{ form_widget(form.level, {
+            'attr': {'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">メインカテゴリー・Catégorie</label>
+        {{ form_widget(form.mainCategory, {
+            'attr': {'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+        }) }}
+    </div>
+
+    <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary">{{ button_label|default('保存する・Enregistrer') }}</button>
+        <a href="{{ path('app_recipe_index') }}" class="btn-secondary text-center">キャンセル</a>
+    </div>
+
 {{ form_end(form) }}

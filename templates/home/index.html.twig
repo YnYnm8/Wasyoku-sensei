@@ -6,7 +6,13 @@
 {% block body %}
 	
 <div class="p-6 space-y-8">
-    <h1 class="font-display text-2xl">ようこそ！{{ app.user.username }}さん</h1>
+    <h1 class="font-display text-2xl">
+        {% if app.user %}
+            ようこそ！{{ app.user.username }}さん
+        {% else %}
+            ようこそ！
+        {% endif %}
+    </h1>
 
     {# 食材で探す #}
     <div>

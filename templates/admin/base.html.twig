@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block header %}{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-washoku-beige">
+
+   
+    <div class="w-full bg-washoku-bg text-white px-6 py-6 lg:px-12">
+        <h1 class="font-display text-2xl">Wasyoku Admin</h1>
+        <p class="text-washoku-inputtext text-sm uppercase tracking-wide mb-5">{{ app.user.username }}</p>
+
+    </div>
+
+    {# ---------- 本文（ベージュ背景、左右の余白はここだけに付ける） ---------- #}
+    <div class="px-4 py-6 lg:px-12">
+        <nav class="flex gap-2">
+            <a href="{{ path('app_recipe_admin_index') }}"
+               class="px-4 py-2 rounded-full text-sm font-semibold transition {{ active_tab == 'recipes' ? 'bg-washoku-red text-white' : 'bg-washoku-beige text-gray-700 hover:opacity-80' }}">
+                Recettes
+            </a>
+            <a href="{{ path('app_condiment_index') }}"
+               class="px-4 py-2 rounded-full text-sm font-semibold transition {{ active_tab == 'condiments' ? 'bg-washoku-red text-white' : 'bg-washoku-beige text-gray-700 hover:opacity-80' }}">
+                Condiments
+            </a>
+        </nav>
+        <div class="mb-4 font-display text-gray-800">
+            {% block admin_breadcrumb %}{% endblock %}
+        </div>
+
+        {% block admin_body %}{% endblock %}
+    </div>
+
+</div>
+{% endblock %}

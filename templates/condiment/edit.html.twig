@@ -1,67 +1,103 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
+{% set active_tab = 'condiments' %}
 
 {% block title %}Edit Condiment{% endblock %}
 
-{% block body %}
-<h1>Edit Condiment</h1>
+{% block admin_breadcrumb %}
+    <a href="{{ path('app_condiment_index') }}" class="text-washoku-inputtext hover:text-white text-sm">
+        ‹ 調味料編集
+    </a>
+    <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">/admin/condiments/{{ condiment.id }}/edit</p>
+{% endblock %}
 
-{{ include('condiment/_form.html.twig', {'button_label': 'Update'}) }}
+{% block admin_body %}
 
-<div>
-    <h2>Substituts</h2>
+    <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
+        <h2 class="font-display text-lg mb-4">基本情報・Informations</h2>
+        {{ include('condiment/_form.html.twig', {'button_label': '基本情報を保存'}) }}
+    </div>
 
-    <button type="button" onclick="document.getElementById('add-substitute-dialog').showModal()">
-        + Ajouter un substitut
-    </button>
+    <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display text-lg">代替品・Substituts</h2>
+            <button type="button"
+                    onclick="document.getElementById('add-substitute-dialog').showModal()"
+                    class="btn-icon-round text-sm">
+                +
+            </button>
+        </div>
 
-    <dialog id="add-substitute-dialog">
-        <form method="post" action="{{ path('app_condiment_substitute_add', {id: condiment.id}) }}">
-            <label>
-                Nom du groupe
-                <input type="text" name="groupLabel_name" required>
-            </label>
+        <ul class="space-y-4">
+            {% for group in condiment.condimentSubstituteGroups %}
+                <li>
+                    <strong class="font-display text-gray-800">{{ group.label }}</strong>
+                    <ul class="mt-2 space-y-2">
+                        {% for substitute in group.condimentSubstitutes %}
+                            <li class="flex items-center justify-between bg-washoku-beige/40 rounded-lg px-3 py-2">
+                                <span class="text-sm text-gray-700">
+                                    {{ substitute.name }} — {{ substitute.quantity }} {{ substitute.unit }}
+                                </span>
+                                <form method="post"
+                                      action="{{ path('app_condiment_substitute_delete', {id: condiment.id, substituteId: substitute.id}) }}"
+                                      style="display:inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_substitute' ~ substitute.id) }}">
+                                    <button type="submit"
+                                            onclick="return confirm('Retirer ce substitut ?')"
+                                            class="text-washoku-red hover:text-washoku-redhover text-sm font-semibold">
+                                        削除
+                                    </button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
 
-            <label>
-                Nom du substitut
-                <input type="text" name="condimentSubstitute_name" required>
-            </label>
+        <button type="button"
+                onclick="document.getElementById('add-substitute-dialog').showModal()"
+                class="btn-secondary mt-4">
+            + 代替品を追加・Ajouter un substitut
+        </button>
+    </div>
 
-            <label>
-                Quantité
-                <input type="number" step="0.1" name="quantity" required>
-            </label>
+    <dialog id="add-substitute-dialog" class="card-popup">
+        <form method="post" action="{{ path('app_condiment_substitute_add', {id: condiment.id}) }}" class="space-y-4">
+            <div>
+                <label class="block font-display text-sm mb-1">グループ名・Nom du groupe</label>
+                <input type="text" name="groupLabel_name" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
 
-            <label>
-                Unité
-                <input type="text" name="unit" required>
-            </label>
+            <div>
+                <label class="block font-display text-sm mb-1">代替品名・Nom du substitut</label>
+                <input type="text" name="condimentSubstitute_name" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
 
-            <button type="submit" class="btn-primary">Ajouter</button>
-            <button type="button" onclick="document.getElementById('add-substitute-dialog').close()" class="btn-secondary">Annuler</button>
+            <div>
+                <label class="block font-display text-sm mb-1">分量・Quantité</label>
+                <input type="number" step="0.1" name="quantity" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+
+            <div>
+                <label class="block font-display text-sm mb-1">単位・Unité</label>
+                <input type="text" name="unit" required
+                       class="w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white">
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary">追加する・Ajouter</button>
+                <button type="button"
+                        onclick="document.getElementById('add-substitute-dialog').close()"
+                        class="btn-secondary">
+                    キャンセル・Annuler
+                </button>
+            </div>
         </form>
     </dialog>
 
-    <ul>
-        {% for group in condiment.condimentSubstituteGroups %}
-            <li>
-                <strong>{{ group.label }}</strong>
-                <ul>
-                    {% for substitute in group.condimentSubstitutes %}
-                        <li>
-                            {{ substitute.name }} — {{ substitute.quantity }} {{ substitute.unit }}
-                            <form method="post" action="{{ path('app_condiment_substitute_delete', {id: condiment.id, substituteId: substitute.id}) }}" style="display:inline">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete_substitute' ~ substitute.id) }}">
-                                <button type="submit" onclick="return confirm('Retirer ce substitut ?')">Retirer</button>
-                            </form>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
-</div>
-
-<a href="{{ path('app_condiment_index') }}">back to list</a>
+{% endblock %}
 
 {{ include('condiment/_delete_form.html.twig') }}
-{% endblock %}

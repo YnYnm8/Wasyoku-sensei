@@ -22,6 +22,8 @@ use App\Repository\RecipeCondimentRepository;
 use App\Entity\RecipeCondiment;
 use App\Repository\CondimentRepository;
 use App\Repository\FavoriteRepository;
+use App\Entity\Media;
+use App\Repository\MediaRepository;
 
 
 #[Route('/recipe')]
@@ -126,10 +128,22 @@ final class RecipeController extends AbstractController
             'form' => $form,
         ]);
     }
+    // US1.3：管理者専用のレシピ一覧（訪問者向けのindex()とは別に用意）
+    // フィルターやお気に入り機能は不要。全件を編集・削除しやすい形で並べるだけ
+    #[Route('/admin', name: 'app_recipe_admin_index', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function adminIndex(RecipeRepository $recipeRepository): Response
+    {
+        $recipes = $recipeRepository->findAll();
+
+        return $this->render('recipe/admin_index.html.twig', [
+            'recipes' => $recipes,
+        ]);
+    }
 
     // 訪問者・管理者どちらもアクセス可能（保護なし）
     #[Route('/{id}', name: 'app_recipe_show', methods: ['GET'])]
-    public function show(Recipe $recipe ,FavoriteRepository $favoriteRepository): Response
+    public function show(Recipe $recipe, FavoriteRepository $favoriteRepository): Response
     {
         $favoriteRecipeIds = [];
         if ($this->getUser()) {
@@ -140,7 +154,7 @@ final class RecipeController extends AbstractController
         }
         return $this->render('recipe/show.html.twig', [
             'recipe' => $recipe,
-            'favoriteRecipeIds'=>$favoriteRecipeIds,
+            'favoriteRecipeIds' => $favoriteRecipeIds,
         ]);
     }
 
@@ -316,6 +330,90 @@ final class RecipeController extends AbstractController
             $request->getPayload()->getString('_token')
         )) {
             $entityManager->remove($recipeCondiment);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    // メイン写真の追加（順番なし、レシピにつき通常1枚を想定）
+    #[Route('/{id}/media/main/add', name: 'app_recipe_main_photo_add', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function addMainPhoto(
+        Request $request,
+        Recipe $recipe,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $url = trim($request->request->get('url', ''));
+
+        if ($url === '') {
+            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()]);
+        }
+
+        $media = new Media();
+        $media->setName($recipe->getName() . ' - photo principale');
+        $media->setUrl($url);
+        $media->setType('photo');
+        // stepOrderは設定しない（null のまま）＝ステップ写真と区別する目印
+        $media->setRecipe($recipe);
+
+        $entityManager->persist($media);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    // 作り方のステップ写真を追加（順番はサーバー側で自動計算）
+    #[Route('/{id}/media/step/add', name: 'app_recipe_step_add', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function addStep(
+        Request $request,
+        Recipe $recipe,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $url = trim($request->request->get('url', ''));
+        $stepDescription = trim($request->request->get('step_description', ''));
+
+        if ($url === '' || $stepDescription === '') {
+            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()]);
+        }
+
+        // 既存のステップ写真（stepOrderがnullではないもの）を数えて、次の番号を自動で割り振る
+        $existingSteps = array_filter(
+            $recipe->getMedia()->toArray(),
+            fn(Media $m) => $m->getStepOrder() !== null
+        );
+        $nextOrder = count($existingSteps) + 1;
+
+        $media = new Media();
+        $media->setName('Étape ' . $nextOrder);
+        $media->setUrl($url);
+        $media->setType('photo');
+        $media->setStepOrder($nextOrder);
+        $media->setStepDescription($stepDescription);
+        $media->setRecipe($recipe);
+
+        $entityManager->persist($media);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
+    }
+    #[Route('/{id}/media/{mediaId}/delete', name: 'app_recipe_media_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function deleteMedia(
+        Request $request,
+        Recipe $recipe,
+        int $mediaId,
+        EntityManagerInterface $entityManager,
+        MediaRepository $mediaRepository
+    ): Response {
+        $media = $mediaRepository->find($mediaId);
+
+        if ($media && $this->isCsrfTokenValid(
+            'delete_media' . $media->getId(),
+            $request->getPayload()->getString('_token')
+        )) {
+            $entityManager->remove($media);
             $entityManager->flush();
         }
 
