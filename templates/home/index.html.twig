@@ -1,18 +1,27 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!
-{% endblock %}
+{% block title %}Hello HomeController!{% endblock %}
 
 {% block body %}
-	
+
+<div class="relative h-64 rounded-2xl overflow-hidden mb-6 bg-cover bg-center" style="background-image: url('/images/home/homepage.png');">
+    <div class="absolute inset-0 bg-black/30"></div>
+
+    <div class="absolute top-4 left-4 text-white font-display text-lg">和 WASYOKU</div>
+    <div class="absolute top-4 right-4 text-white text-2xl">☰</div>
+
+    <div class="absolute bottom-4 left-4">
+        <span class="bg-washoku-red text-white text-xs px-3 py-1 rounded-full">和食先生</span>
+        <h1 class="text-white font-display text-2xl mt-2">L'art culinaire<br>japonais</h1>
+    </div>
+</div>
+
 <div class="p-6 space-y-8">
-    <h1 class="font-display text-2xl">
-        {% if app.user %}
-            ようこそ！{{ app.user.username }}さん
-        {% else %}
-            ようこそ！
-        {% endif %}
-    </h1>
+    {% if app.user %}
+        <h1 class="font-display text-2xl text-washoku-red">ようこそ！{{ app.user.username }}さん</h1>
+    {% else %}
+        <h1 class="font-display text-2xl text-washoku-red">ようこそ！</h1>
+    {% endif %}
 
     {# 食材で探す #}
     <div>
@@ -26,30 +35,81 @@
 
     {# 主食材で探す #}
     <div>
-        <h2 class="font-display text-lg">PAR INGRÉDIENT PRINCIPAL</h2>
-        <p class="text-sm text-gray-500">主食材で探す</p>
-        <div class="flex gap-2 mt-2">
-            <a href="{{ path('app_recipe_index', {'mainCategory': 'meat'}) }}" class="btn-secondary !w-auto px-4">Viande</a>
-            <a href="{{ path('app_recipe_index', {'mainCategory': 'fish'}) }}" class="btn-secondary !w-auto px-4">Poisson</a>
-            <a href="{{ path('app_recipe_index', {'mainCategory': 'tofu'}) }}" class="btn-secondary !w-auto px-4">Tofu</a>
-            <a href="{{ path('app_recipe_index', {'mainCategory': 'vegetable'}) }}" class="btn-secondary !w-auto px-4">Légumes</a>
+        <div class="flex items-center justify-between">
+            <h2 class="font-display text-xl">主食材で探す</h2>
+            <span class="w-2 h-2 bg-washoku-red rounded-full"></span>
+        </div>
+        <p class="text-sm text-gray-500">PAR INGRÉDIENT PRINCIPAL</p>
+        <div class="grid grid-cols-4 gap-2 mt-4">
+            <a href="{{ path('app_recipe_index', {'mainCategory': 'meat'}) }}" class="flex flex-col items-center gap-2 bg-washoku-cream border border-washoku-beige rounded-2xl p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 20 20" width="20" height="20">
+                    <path d="M13.7143 2C14.5443 2 15.3343 2.22 16.0043 2.66C17.1443 3.4 17.8443 4.5318.0043 5.84C18.0615 6.47455 17.9793 7.11392 17.7633 7.71334C17.5474 8.31275 17.203 8.8577 16.7543 9.31C16.0543 10 15.1643 10.4414.1843 10.54C12.2743 10.74 10.5943 11.5 9.34433 12.77C9.1931 12.9172 8.99038 12.9996 8.77933 12.9996C8.56828 12.9996 8.36556 12.9172 8.21433 12.77L7.22433 11.78C7.15422 11.7108 7.09864 11.6282 7.06086 11.5372C7.02308 11.4462 7.00386 11.3485 7.00433 11.25C7.00433 11 7.11433 10.78 7.32433 10.57C8.53433 9.35 9.27433 7.73 9.45433 5.87C9.58433 4.54 10.2943 3.4 11.4543 2.65C12.1143 2.22 12.8943 2 13.7143 2ZM13.7143 0C12.5443 0 11.3743 0.32 10.3643 0.97C8.60433 2.1 7.63433 3.86 7.46433 5.68C7.33433 7 6.83433 8.23 5.91433 9.15L5.88433 9.18C4.72433 10.34 4.72433 12.11 5.81433 13.19L6.80433 14.18C7.35433 14.73 8.06433 15 8.77433 15C9.48433 15 10.2043 14.73 10.7543 14.18C11.7243 13.21 13.0043 12.68 14.3943 12.53C15.7643 12.38 17.1043 11.78 18.1643 10.73C18.8294 10.0659 19.3366 9.26076 19.6485 8.37417C19.9604 7.48759 20.069 6.54223 19.9663 5.60801C19.8635 4.67379 19.5521 3.77462 19.055 2.977C18.5579 2.17939 17.8878 1.50373 17.0943 1C16.0843 0.33 14.9043 0 13.7143 0ZM4.26433 17.86C4.53433 18.42 4.44433 19.1 3.97433 19.56C3.77077 19.7666 3.51134 19.9094 3.22784 19.9707C2.94434 20.032 2.64911 20.0092 2.37837 19.9052C2.10762 19.8011 1.87313 19.6203 1.70366 19.3849C1.53419 19.1495 1.43711 18.8698 1.42433 18.58C1.13456 18.5672 0.854822 18.4701 0.61943 18.3007C0.384037 18.1312 0.203226 17.8967 0.0991749 17.626C-0.00487617 17.3552 -0.0276424 17.06 0.0336687 16.7765C0.0949798 16.493 0.237702 16.2336 0.444329 16.03C0.904329 15.57 1.59433 15.47 2.14433 15.74L4.62433 13.31C4.76433 13.5 4.92433 13.72 5.10433 13.9L6.09433 14.89C6.30433 15.09 6.50433 15.26 6.76433 15.41L4.26433 17.86Z" fill="#8C2121"/>
+                </svg>
+                <span class="text-xs text-center">肉<br><span class="text-gray-500">Viande</span></span>
+            </a>
+            <a href="{{ path('app_recipe_index', {'mainCategory': 'fish'}) }}" class="flex flex-col items-center gap-2 bg-washoku-cream border border-washoku-beige rounded-2xl p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 48 48" width="20" height="20">
+                    <g>
+                        <path stroke="#8C2121" stroke-linecap="round" stroke-linejoin="round" d="M30 39c9 0 15 -8.571 15 -15S39 9 30 9c-7.996 0 -14.66 5.233 -18.217 9.676a10.78 10.78 0 0 0 -0.8 -2.181c-1.089 -2.24 -3.586 -3.787 -5.38 -4.655 -1.06 -0.514 -2.232 0.153 -2.38 1.321 -0.29 2.276 -0.483 5.849 0.661 8.203 0.572 1.177 1.209 2.044 1.875 2.636 -0.666 0.592 -1.303 1.459 -1.875 2.636 -1.144 2.354 -0.951 5.927 -0.662 8.203 0.149 1.168 1.322 1.835 2.381 1.322 1.794 -0.869 4.291 -2.415 5.38 -4.655 0.372 -0.767 0.635 -1.496 0.8 -2.182C15.34 33.767 22.004 39 30 39Z" stroke-width="3"></path>
+                        <path stroke="#8C2121" stroke-linecap="round" d="M29.334 14.4c-3.385 4.76 -3.385 14.441 0 19.2" stroke-width="3"></path>
+                        <path stroke="#8C2121" stroke-linecap="round" d="M21 20c-0.667 1.983 -0.667 6.017 0 8" stroke-width="3"></path>
+                        <path stroke="#8C2121" stroke-linecap="round" d="m35 20 0 1" stroke-width="3"></path>
+                    </g>
+                </svg>
+                <span class="text-xs text-center">魚<br><span class="text-gray-500">Poisson</span></span>
+            </a>
+            <a href="{{ path('app_recipe_index', {'mainCategory': 'tofu'}) }}" class="flex flex-col items-center gap-2 bg-washoku-cream border border-washoku-beige rounded-2xl p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 48 48" width="20" height="20">
+                    <g>
+                        <path stroke="#8C2121" stroke-linejoin="round" d="M3.688 36.278c0.163 1.164 0.912 2.131 1.972 2.638C9.474 40.741 18.922 45 24 45c5.078 0 14.526 -4.26 18.34 -6.084 1.06 -0.507 1.809 -1.474 1.972 -2.638C44.605 34.18 45 30.204 45 24c0 -6.204 -0.395 -10.18 -0.688 -12.278 -0.163 -1.164 -0.912 -2.131 -1.972 -2.638C38.526 7.259 29.078 3 24 3 18.922 3 9.474 7.26 5.66 9.084c-1.06 0.507 -1.809 1.474 -1.972 2.638C3.395 13.82 3 17.796 3 24c0 6.204 0.395 10.18 0.688 12.278Z" stroke-width="3"></path>
+                        <path stroke="#8C2121" stroke-linecap="round" stroke-linejoin="round" d="M44.281 11.756C41.033 13.356 27.714 19.8 24 19.8c-3.715 0 -17.034 -6.445 -20.282 -8.044" stroke-width="3"></path>
+                        <path stroke="#8C2121" stroke-linecap="round" stroke-linejoin="round" d="M24 19.8v24.95" stroke-width="3"></path>
+                    </g>
+                </svg>
+                <span class="text-xs text-center">豆腐<br><span class="text-gray-500">Tofu</span></span>
+            </a>
+            <a href="{{ path('app_recipe_index', {'mainCategory': 'vegetable'}) }}" class="flex flex-col items-center gap-2 bg-washoku-cream border border-washoku-beige rounded-2xl p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 640 512" width="20" height="20" fill="#8C2121">
+                    <path d="M453.1-36.7L440.9-24.6c-31.2 31.2-31.2 81.9 0 113.1 15.6 15.6 31.2 31.246.9 46.9 31.2 31.2 81.9 31.2 113.1 0l12.1-12.1c6.2-6.2 6.2-16.4 0-22.6L600.9 88.6c-31.2-31.2-81.9-31.2-113.1 0 31.2-31.2 31.2-81.9 0-113.1L475.7-36.7c-6.2-6.2-16.4-6.2-22.6 0zM331.6 96c-45.2 0-87.1 20.4-115 54.3L273.3 207c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L191.6 193.2 67.2 466.8c-5.5 12.1-2.9 26.4 6.5 35.9s23.7 12 35.9 6.5l141.6-64.4-43.8-43.8c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.433.9 0l56.5 56.5 95.3-43.3c53.1-24.1 87.2-77.1 87.2-135.5 0-82.2-66.6-148.8-148.8-148.8z"/>
+                </svg>
+                <span class="text-xs text-center">野菜<br><span class="text-gray-500">Légumes</span></span>
+            </a>
         </div>
     </div>
 
     {# 難易度で探す #}
     <div>
-        <h2 class="font-display text-lg">PAR DIFFICULTÉ</h2>
-        <p class="text-sm text-gray-500">難易度で探す</p>
-        <div class="flex gap-2 mt-2">
-            <a href="{{ path('app_recipe_index', {'level': 'easy'}) }}" class="btn-secondary !w-auto px-4">Facile</a>
-            <a href="{{ path('app_recipe_index', {'level': 'medium'}) }}" class="btn-secondary !w-auto px-4">Moyen</a>
-            <a href="{{ path('app_recipe_index', {'level': 'hard'}) }}" class="btn-secondary !w-auto px-4">Difficile</a>
+        <div class="flex items-center justify-between">
+            <h2 class="font-display text-xl">難易度で探す</h2>
+            <span class="w-2 h-2 bg-washoku-red rounded-full"></span>
+        </div>
+        <p class="text-sm text-gray-500">PAR DIFFICULTÉ</p>
+        <div class="grid grid-cols-3 gap-2 mt-4">
+            <a href="{{ path('app_recipe_index', {'level': 'easy'}) }}" class="flex flex-col items-center gap-2 bg-washoku-cream border border-washoku-beige rounded-2xl p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512" width="20" height="20" fill="#8C2121">
+                    <path d="M0 176c0-35.3 28.7-64 64-64 .5 0 1.1 0 1.6 0 7.4-36.5 39.7-64 78.4-64 15 0 29 4.1 40.9 11.2 13.3-25.7 40.1-43.2 71.1-43.2s57.8 17.6 71.1 43.2c12-7.1 26-11.2 40.9-11.2 38.7 0 71 27.5 78.4 64 .5 0 1.1 01.6 0 35.3 0 64 28.7 64 64 0 11.7-3.1 22.6-8.6 32L8.6 208C3.1 198.6 0 187.7 0 176zM0 283.4C0 268.3 12.3 256 27.4 256l457.1 0c15.1 0 27.4 12.3 27.4 27.4 0 70.5-44.4 130.7-106.7 154.1L403.5 452c-2 16-15.6 28-31.8 28l-231.5 0c-16.1 0-29.8-12-31.8-28l-1.8-14.4C44.4 414.1 0 353.9 0 283.4z"/>
+                </svg>
+                <span class="text-xs text-center">簡単<br><span class="text-gray-500">Facile</span></span>
+            </a>
+            <a href="{{ path('app_recipe_index', {'level': 'medium'}) }}" class="flex flex-col items-center gap-2 bg-washoku-cream border border-washoku-beige rounded-2xl p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512" width="20" height="20" fill="#8C2121">
+                    <path d="M0 176c0-35.3 28.7-64 64-64 .5 0 1.1 0 1.6 0 7.4-36.5 39.7-64 78.4-64 15 0 29 4.1 40.9 11.2 13.3-25.7 40.1-43.2 71.1-43.2s57.8 17.6 71.1 43.2c12-7.1 26-11.2 40.9-11.2 38.7 0 71 27.5 78.4 64 .5 0 1.1 01.6 0 35.3 0 64 28.7 64 64 0 11.7-3.1 22.6-8.6 32L8.6 208C3.1 198.6 0 187.7 0 176zM0 283.4C0 268.3 12.3 256 27.4 256l457.1 0c15.1 0 27.4 12.3 27.4 27.4 0 70.5-44.4 130.7-106.7 154.1L403.5 452c-2 16-15.6 28-31.8 28l-231.5 0c-16.1 0-29.8-12-31.8-28l-1.8-14.4C44.4 414.1 0 353.9 0 283.4z"/>
+                </svg>
+                <span class="text-xs text-center">普通<br><span class="text-gray-500">Moyen</span></span>
+            </a>
+            <a href="{{ path('app_recipe_index', {'level': 'hard'}) }}" class="flex flex-col items-center gap-2 bg-washoku-cream border border-washoku-beige rounded-2xl p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512" width="20" height="20" fill="#8C2121">
+                    <path d="M0 176c0-35.3 28.7-64 64-64 .5 0 1.1 0 1.6 0 7.4-36.5 39.7-64 78.4-64 15 0 29 4.1 40.9 11.2 13.3-25.7 40.1-43.2 71.1-43.2s57.8 17.6 71.1 43.2c12-7.1 26-11.2 40.9-11.2 38.7 0 71 27.5 78.4 64 .5 0 1.1 01.6 0 35.3 0 64 28.7 64 64 0 11.7-3.1 22.6-8.6 32L8.6 208C3.1 198.6 0 187.7 0 176zM0 283.4C0 268.3 12.3 256 27.4 256l457.1 0c15.1 0 27.4 12.3 27.4 27.4 0 70.5-44.4 130.7-106.7 154.1L403.5 452c-2 16-15.6 28-31.8 28l-231.5 0c-16.1 0-29.8-12-31.8-28l-1.8-14.4C44.4 414.1 0 353.9 0 283.4z"/>
+                </svg>
+                <span class="text-xs text-center">難易<br><span class="text-gray-500">Difficile</span></span>
+            </a>
         </div>
     </div>
 
     <a href="{{ path('app_recipe_index') }}" class="btn-primary block text-center">Aller voir toutes les recettes</a>
 </div>
-	<h2>PRESQUE POPULAIRES</h2>
+
+<h2>PRESQUE POPULAIRES</h2>
 <p>人気のレシピ</p>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
@@ -62,9 +122,14 @@
         <p>まだ、レシピがありません。</p>
     {% endfor %}
 </div>
-	<div>
 
-		<a href="{{ path('app_condiment_index') }}" class="btn-primary">Guide des condiments</a>
+<a href="{{ path('app_condiment_index') }}" class="flex items-center gap-4 bg-white rounded-2xl shadow p-4 my-4">
+    <img src="/images/condiments/mirin.jpeg" alt="Guide des condiments" class="w-16 h-16 rounded-full object-cover flex-shrink-0">
+    <div class="flex-1">
+        <p class="font-display text-lg">調味料ガイド</p>
+        <p class="text-sm text-gray-500">GUIDE DES CONDIMENTS</p>
+    </div>
+    <span class="text-washoku-red text-xl">›</span>
+</a>
 
-	</div>
 {% endblock %}

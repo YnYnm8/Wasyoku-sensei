@@ -12,7 +12,11 @@
 
 /* メインボタン（赤、幅いっぱい） - 確定、送信などに使用 */
 .btn-primary {
-    @apply w-full bg-washoku-red hover:bg-washoku-redhover text-white font-semibold rounded-lg py-2.5 transition;
+    @apply w-full bg-washoku-red hover:bg-washoku-redhover text-white font-semibold rounded-lg py-2.5 transition font-display;
+}
+
+.btn-secondary {
+    @apply w-full bg-washoku-cream border border-washoku-beige text-gray-700 font-semibold rounded-lg py-2.5 hover:bg-gray-50 transition font-display;
 }
 
 /* サブボタン（薄い色、幅いっぱい） - キャンセル、戻るなどに使用 */

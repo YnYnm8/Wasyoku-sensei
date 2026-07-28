@@ -15,6 +15,7 @@ module.exports = {
           redhover: '#701A1A',
           cream: '#FBF8F1',
           beige: '#E3DBCD',
+          yellow: '#F68F1A',
         },
       },
       fontFamily: {
