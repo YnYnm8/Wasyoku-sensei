@@ -1,93 +1,66 @@
 {% extends 'base.html.twig' %}
-{% block title %}Recipe
-{% endblock %}
+{% block title %}{{ recipe.name }}{% endblock %}
 {% block body %}
-
-<h1>Recipe</h1>
-
-<table class="table">
-    <tbody>
-        <tr>
-            <th>Id</th>
-            <td>{{ recipe.id }}</td>
-        </tr>
-        <tr>
-            <th>Name</th>
-            <td>{{ recipe.name }}</td>
-        </tr>
-        <tr>
-            <th>Description</th>
-            <td>{{ recipe.description }}</td>
-        </tr>
-        <tr>
-            <th>Season</th>
-            <td>{{ recipe.season.label }}</td>
-        </tr>
-        <tr>
-            <th>Time</th>
-            <td>{{ recipe.time }}</td>
-        </tr>
-        <tr>
-            <th>Level</th>
-            <td>{{ recipe.level.label }}</td>
-        </tr>
-        <tr>
-            <th>MainCategory</th>
-            <td>{{ recipe.mainCategory.label }}</td>
-        </tr>
-    </tbody>
-</table>
-
 <div>
-    <h2>材料</h2>
-    <p>INGREDIENT POUR</p>
+    {% set mainPhoto = recipe.media|filter(m => m.stepOrder is null)|first %}
+    {% if mainPhoto %}
+        <img src="{{ mainPhoto.url }}" alt="{{ recipe.name }}" class="w-full h-64 object-cover">
+    {% endif %}
 
-    <div>
-        <button id="decrease-btn" type="button">−</button>
-        <span id="person-count">1</span>
-        <button id="increase-btn" type="button">＋</button>
-        <span>PERSONNES</span>
+    <div class="p-4">
+        <h1 class="font-display text-2xl">{{ recipe.name }}</h1>
+        <p class="text-sm text-gray-500">{{ recipe.time }} — {{ recipe.level.label }} — {{ recipe.season.label }}</p>
+    </div>
+</div>
+
+    <div class="p-4">
+    <div class="flex items-center justify-between">
+        <h2 class="font-display text-lg">材料</h2>
+        <span class="w-4 h-4 bg-washoku-red "></span>
+    </div>
+    <p class="text-sm text-gray-500">INGREDIENTS POUR</p>
+
+    <div class="flex items-center gap-3 bg-white rounded-2xl shadow p-3 my-4 w-fit">
+        <button id="decrease-btn" type="button" class="w-10 h-10 rounded-full border border-washoku-beige flex items-center justify-center">−</button>
+        <span id="person-count" class="text-2xl w-8 text-center">1</span>
+        <button id="increase-btn" type="button" class="btn-icon-round">＋</button>
+        <span class="bg-washoku-beige text-gray-600 text-xs px-3 py-2 rounded-full">PERSONNES</span>
     </div>
 
     <ul>
         {% for ri in recipe.recipeIngredients %}
-            <li data-base-quantity="{{ ri.quantity }}">
-                {{ ri.ingredient.name }}
-                -
-                <span class="quantity">{{ ri.quantity }}</span>
-                {{ ri.unit }}
+            <li data-base-quantity="{{ ri.quantity }}" class="flex items-center justify-between border-b border-washoku-beige py-3">
+                <span>{{ ri.ingredient.name }}</span>
+                <span class="quantity font-semibold text-washoku-red">{{ ri.quantity }}</span>
+                <span class="font-semibold text-washoku-red">{{ ri.unit }}</span>
             </li>
         {% endfor %}
     </ul>
 
     <div>
-        <h2>調味料</h2>
         <ul>
             {% for rc in recipe.recipeCondiments %}
-                <li data-base-quantity="{{ rc.quantity }}">
-                    {{ rc.condiment.name }}
-                    -
-                    <span class="quantity">{{ rc.quantity }}</span>
-                    {{ rc.unit }}
-
-                    {#  rc.condiment.condimentSubstituteGroups で、この調味料に紐づく、代替品グループを、すべて取得する
-                        |length で、その、個数を、数える　> 0 で、「1つでも、あれば」という、条件にする代替品が、無い調味料には、ボタン自体を、表示しないため）#}
+                <li data-base-quantity="{{ rc.quantity }}" class="flex items-center justify-between border-b border-washoku-beige py-3">
+                    <span class="flex items-center gap-2">
+                        {{ rc.condiment.name }}
+                        {% if rc.condiment.condimentSubstituteGroups|length > 0 %}
+                            <button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').showModal()" class="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-full ">
+                                代用品をみる　Substitut possible
+                            </button>
+                        {% endif %}
+                    </span>
+                    <span class="quantity font-semibold text-washoku-red">{{ rc.quantity }}</span>
+                    <span class="font-semibold text-washoku-red">{{ rc.unit }}</span>
 
                     {% if rc.condiment.condimentSubstituteGroups|length > 0 %}
-                        <button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').showModal()">
-                            代用品を見る
-                        </button>
-
-                        <dialog id="dialog-{{ rc.condiment.id }}">
-                            <p>Pas de{{ rc.condiment.name }}？</p>
+                        <dialog id="dialog-{{ rc.condiment.id }}" class="card-popup">
+                            <p>Pas de {{ rc.condiment.name }}？</p>
                             <ul>
                                 {% for group in rc.condiment.condimentSubstituteGroups %}
-                                    <li>
-                                        {{ group.label }}
-                                    </li>
+                                    <li>{{ group.label }}</li>
                                 {% endfor %}
                             </ul>
-                            <button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').close()">Valider</button>
+                            <button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').close()" class="btn-primary">Valider</button>
                         </dialog>
                     {% endif %}
                 </li>
@@ -96,16 +69,24 @@
     </div>
 </div>
 
-<div>
-    <h2>作り方</h2>
-    <p>PRÉPARATION</p>
-    {% for media in recipe.media|filter(m => m.stepOrder is not null)|sort((a, b) => a.stepOrder <=> b.stepOrder) %}
-        <div>
-            <span>{{ '%02d'|format(media.stepOrder) }}</span>
-            <img src="{{ media.url }}" alt="{{ media.stepDescription }}">
-            <p>{{ media.stepDescription }}</p>
-        </div>
-    {% endfor %}
+<div class="p-4">
+    <div class="flex items-center justify-between">
+        <h2 class="font-display text-lg">作り方</h2>
+        <span class="w-4 h-4 bg-washoku-red "></span>
+    </div>
+    <p class="text-sm text-gray-500">PRÉPARATION</p>
+
+    <div class="mt-4 space-y-4">
+        {% for media in recipe.media|filter(m => m.stepOrder is not null)|sort((a, b) => a.stepOrder <=> b.stepOrder) %}
+            <div class="flex items-center gap-4 border-b border-washoku-beige pb-4">
+                <span class="text-washoku-red font-display text-2xl w-8">{{ '%02d'|format(media.stepOrder) }}</span>
+                <img src="{{ media.url }}" alt="{{ media.stepDescription }}" class="w-36 h- object-cover rounded-lg flex-shrink-0">
+                <div>
+                    <p class="font-semibold">{{ media.stepDescription }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 
 {% if app.user %}

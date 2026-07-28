@@ -6,7 +6,7 @@
         {% block title %}Welcome!{% endblock %}
     </title>
 
-    <link rel="icon" href="data:image/svg+xml,...">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     {% block stylesheets %}{% endblock %}
@@ -16,28 +16,24 @@
     {% endblock %}
 </head>
 <body>
-<header>
-<nav>
-<a href = "{{path('app_home')}}">Wasyoku Sensei</a>
-{% if is_granted('ROLE_ADMIN') %}
-<div>
-  <span>Admin</span>
-                    <a href="{{ path('app_recipe_index') }}">Recettes</a>
-                    <a href="{{ path('app_condiment_index') }}">Condiments</a>
+<header class="bg-washoku-bg text-washoku-cream px-6 py-6">
+    <nav class="flex items-center justify-between">
+        <a href="{{ path('app_home') }}" class="font-display text-2xl">Wasyoku Sensei</a>
 
-</div>
-   {% endif %}
-   {% if app.user %}
-    <a href="{{ path('app_favorite_index') }}">Mes favoris</a>
-     {% else %}
-      <a href="{{ path('app_login') }}">Se connecter</a>
-   {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="flex items-center gap-4">
+                <span class="text-washoku-inputtext text-sm">Admin</span>
+                <a href="{{ path('app_recipe_index') }}" class="text-base hover:text-washoku-red transition">Recettes</a>
+                <a href="{{ path('app_condiment_index') }}" class="text-base hover:text-washoku-red transition">Condiments</a>
+            </div>
+        {% endif %}
 
-</nav>
-
-    
-
-
+        {% if app.user %}
+            <a href="{{ path('app_favorite_index') }}" class="text-base hover:text-washoku-red transition">Mes favoris</a>
+        {% else %}
+            <a href="{{ path('app_login') }}" class="text-base hover:text-washoku-red transition">Se connecter</a>
+        {% endif %}
+    </nav>
 </header>
     {% block body %}{% endblock %}
 
@@ -78,10 +74,9 @@
         document.addEventListener('turbo:load', openShoppingListSentDialog);
     </script>
 {% endfor %}
-    <footer>
-        <p>和 WASYOKU</p>
-        {# これはTwigの機能で、「今日の日付から、年（西暦4桁）だけを取り出す」という意味 #}
-        <p>&copy; {{ "now"|date("Y") }} WASYOKU - Tous droits réservés.</p>
-    </footer>
+   <footer class="bg-washoku-bg text-washoku-inputtext text-center py-6 mt-8">
+    <p class="font-display text-washoku-red">和 WASYOKU</p>
+    <p class="text-xs">&copy; {{ "now"|date("Y") }} WASYOKU - Tous droits réservés.</p>
+</footer>
 </body>
 </html>

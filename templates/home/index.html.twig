@@ -4,62 +4,58 @@
 {% endblock %}
 
 {% block body %}
-	<style>
-		.example-wrapper {
-			margin: 1em auto;
-			max-width: 800px;
-			width: 95%;
-			font: 18px / 1.5 sans-serif;
-		}
-		.example-wrapper code {
-			background: #F5F5F5;
-			padding: 2px 6px;
-		}
-	</style>
+	
+<div class="p-6 space-y-8">
+    <h1 class="font-display text-2xl">ようこそ！{{ app.user.username }}さん</h1>
 
-	<div class="example-wrapper">
-		{% if app.user %}
-			<h1>ようこそ！{{ app.user.username }}さん</h1>
-		{% else %}
-			<h1>ようこそ！</h1>
-		{% endif %}
-		{# 食材で探す #}
-		<h2>PAR INGRÉDIENTS</h2>
-		<form method="get" action="{{ path('app_recipe_index') }}">
-			<input type="text" name="ingredients" placeholder="Rechercher un ingrédient, une recette...">
-			<button type="submit" class="btn-primary">Rechercher</button>
-		</form>
+    {# 食材で探す #}
+    <div>
+        <h2 class="font-display text-lg">PAR INGRÉDIENTS</h2>
+        <p class="text-sm text-gray-500">食材で探す</p>
+        <form method="get" action="{{ path('app_recipe_index') }}" class="flex gap-2 mt-2">
+            <input type="text" name="ingredients" placeholder="Rechercher un ingrédient, une recette..." class="flex-1 border border-washoku-beige rounded-lg px-3 py-2">
+            <button type="submit" class="btn-primary !w-auto px-6">Rechercher</button>
+        </form>
+    </div>
 
-		{# 主食材で探す（クイック検索ボタン） #}
-		<h2>PAR INGRÉDIENT PRINCIPAL</h2>
-		<a href="{{ path('app_recipe_index', {'mainCategory': 'meat'}) }}">Viande</a>
-		<a href="{{ path('app_recipe_index', {'mainCategory': 'fish'}) }}">Poisson</a>
-		<a href="{{ path('app_recipe_index', {'mainCategory': 'tofu'}) }}">Tofu</a>
-		<a href="{{ path('app_recipe_index', {'mainCategory': 'vegetable'}) }}">Légumes</a>
+    {# 主食材で探す #}
+    <div>
+        <h2 class="font-display text-lg">PAR INGRÉDIENT PRINCIPAL</h2>
+        <p class="text-sm text-gray-500">主食材で探す</p>
+        <div class="flex gap-2 mt-2">
+            <a href="{{ path('app_recipe_index', {'mainCategory': 'meat'}) }}" class="btn-secondary !w-auto px-4">Viande</a>
+            <a href="{{ path('app_recipe_index', {'mainCategory': 'fish'}) }}" class="btn-secondary !w-auto px-4">Poisson</a>
+            <a href="{{ path('app_recipe_index', {'mainCategory': 'tofu'}) }}" class="btn-secondary !w-auto px-4">Tofu</a>
+            <a href="{{ path('app_recipe_index', {'mainCategory': 'vegetable'}) }}" class="btn-secondary !w-auto px-4">Légumes</a>
+        </div>
+    </div>
 
-		{# 難易度で探す #}
-		<h2>PAR DIFFICULTÉ</h2>
-		<a href="{{ path('app_recipe_index', {'level': 'easy'}) }}">Facile</a>
-		<a href="{{ path('app_recipe_index', {'level': 'medium'}) }}">Moyen</a>
-		<a href="{{ path('app_recipe_index', {'level': 'hard'}) }}">Difficile</a>
-		<div>
+    {# 難易度で探す #}
+    <div>
+        <h2 class="font-display text-lg">PAR DIFFICULTÉ</h2>
+        <p class="text-sm text-gray-500">難易度で探す</p>
+        <div class="flex gap-2 mt-2">
+            <a href="{{ path('app_recipe_index', {'level': 'easy'}) }}" class="btn-secondary !w-auto px-4">Facile</a>
+            <a href="{{ path('app_recipe_index', {'level': 'medium'}) }}" class="btn-secondary !w-auto px-4">Moyen</a>
+            <a href="{{ path('app_recipe_index', {'level': 'hard'}) }}" class="btn-secondary !w-auto px-4">Difficile</a>
+        </div>
+    </div>
 
-			<a href="{{ path('app_recipe_index') }}" class="btn-primary">Aller voir toutes les recettes</a>
-		</div>
-	</div>
-	<h2>RECETTES POPULAIRES</h2>
-	<p>人気のレシピ</p>
+    <a href="{{ path('app_recipe_index') }}" class="btn-primary block text-center">Aller voir toutes les recettes</a>
+</div>
+	<h2>PRESQUE POPULAIRES</h2>
+<p>人気のレシピ</p>
 
-	<div class="grid grid-cols-1 gap-4">
-		{% for recipe in recipes %}
-			{% include 'recipe/_card.html.twig' with {
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+    {% for recipe in recipes %}
+        {% include 'recipe/_card.html.twig' with {
             recipe: recipe,
             favoriteRecipeIds: favoriteRecipeIds
         } %}
-		{% else %}
-			<p>まだ、レシピがありません。</p>
-		{% endfor %}
-	</div>
+    {% else %}
+        <p>まだ、レシピがありません。</p>
+    {% endfor %}
+</div>
 	<div>
 
 		<a href="{{ path('app_condiment_index') }}" class="btn-primary">Guide des condiments</a>
