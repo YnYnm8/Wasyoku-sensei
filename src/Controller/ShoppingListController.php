@@ -41,7 +41,7 @@ final class ShoppingListController extends AbstractController
         // （include_recipe_1, include_recipe_23 のように、レシピIDごとに名前が違うので、
         //   $request->request->all() で、送られてきた"全部"を、一旦受け取る）
         $allData = $request->request->all();
-        // ''これはメモがなかったらからの配列として送ってくださいといういみ
+        // これはメモがなかったら、空の配列として送ってください、という意味
         $memo = $request->request->get('memo', '');
 
         // セッションに、今回チェックされた内容・メモを保存する
@@ -63,7 +63,7 @@ final class ShoppingListController extends AbstractController
         // セッションに保存しておいた、大きな配列（TWIGでINPUTにこのような名前がついているため）を、丸ごと取り出しています。
         $allData = $session->get('shopping_confirm_allData', []);
         // 「$allDataという配列の中に、'checked_items'というキーが、もし存在すれば、その値を使う。もし存在しなければ（nullのような扱いになるので）、代わりに、空の配列[]を使う」
-        // この？？があることで、エラーの予防になる
+        // この ?? があることで、エラーの予防になる
         $checkedItems = $allData['checked_items'] ?? [];
         $memo = $allData['memo'] ?? '';
 
@@ -90,6 +90,8 @@ final class ShoppingListController extends AbstractController
         $recipeIds = $session->get('shopping_list_recipe_ids', []);
 
         // Recipeだけでなく、Favorite（人数の情報を持っている）を、まとめて取得する
+        // 「レシピのIDだけを追いかけるのではなく、"お気に入り"という、ユーザー・レシピ・人数がセットになった記録そのものを
+        // 取ってくることで、人数の情報も自然に手に入る」という考え方
         $favorites = $favoriteRepository->createQueryBuilder('f')
             ->where('f.user = :user')
             ->andWhere('f.recipe IN (:recipeIds)')
@@ -124,6 +126,7 @@ final class ShoppingListController extends AbstractController
 
         $emailChoice = $request->request->get('email_choice');
 
+        // US6.2 CA3：メール送信先を、アカウントのメール、または、自由入力の別のメールから選ぶ
         if ($emailChoice === 'account') {
             $toAddress = $this->getUser()->getEmail();
         } else {
@@ -158,6 +161,7 @@ final class ShoppingListController extends AbstractController
 
         $mailer->send($email);
 
+        // US6.2 CA4：送信完了メッセージを、次の画面で、ポップアップとして表示するための、フラッシュメッセージ
         $this->addFlash('shopping_list_sent', true);
 
         return $this->redirectToRoute('app_shopping_list_confirm_show');
@@ -189,15 +193,16 @@ final class ShoppingListController extends AbstractController
                     $recipeId = $ri->getRecipe()->getId();
                     $recipeName = $ri->getRecipe()->getName();
 
-                    // このレシピIDが、まだ $displayItems に登場していなければ、先に「箱」を作っておく
+                    // このレシピIDが、まだ $displayItems に登場していなければ、先に「箱」を作っておく。「からあげ」という引き出し自体が、まだ無ければ
                     if (!isset($displayItems[$recipeId])) {
+                        // その引き出し自体を、新しく作る（中には、レシピ名と、まだ空っぽの材料リストを入れる）
                         $displayItems[$recipeId] = [
                             'recipeName' => $recipeName,
                             'items' => [],
                         ];
                     }
 
-                    // 「からあげ」の引き出しの中の、材料リストに、今処理している1件を追加する
+                    // 「からあげ」の引き出しの中の、「材料リスト」という、さらに小さい引き出しに、今処理している1つの材料を、追加する
                     $displayItems[$recipeId]['items'][] = [
                         'name' => $ri->getIngredient()->getName(),
                         'quantity' => $ri->getQuantity(),
