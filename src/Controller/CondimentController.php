@@ -60,6 +60,18 @@ final class CondimentController extends AbstractController
             'form' => $form,
         ]);
     }
+    
+    // US3.x：管理者専用の調味料一覧（訪問者向けのindex()とは別に用意）
+    #[Route('/admin', name: 'app_condiment_admin_index', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function adminIndex(CondimentRepository $condimentRepository): Response
+    {
+        $condiments = $condimentRepository->findAll();
+
+        return $this->render('condiment/admin_index.html.twig', [
+            'condiments' => $condiments,
+        ]);
+    }
 
     #[Route('/{id}', name: 'app_condiment_show', methods: ['GET'])]
     public function show(Condiment $condiment): Response
@@ -157,33 +169,33 @@ final class CondimentController extends AbstractController
         return $this->redirectToRoute('app_condiment_edit', ['id' => $condiment->getId()], Response::HTTP_SEE_OTHER);
     }
     #[Route('/{id}/substitute/{substituteId}/delete', name: 'app_condiment_substitute_delete', methods: ['POST'])]
-#[IsGranted('ROLE_ADMIN')]
-public function deleteSubstitute(
-    Request $request,
-    Condiment $condiment,
-    int $substituteId,
-    EntityManagerInterface $entityManager,
-    CondimentSubstituteRepository $condimentSubstituteRepository
-): Response {
-    $substitute = $condimentSubstituteRepository->find($substituteId);
+    #[IsGranted('ROLE_ADMIN')]
+    public function deleteSubstitute(
+        Request $request,
+        Condiment $condiment,
+        int $substituteId,
+        EntityManagerInterface $entityManager,
+        CondimentSubstituteRepository $condimentSubstituteRepository
+    ): Response {
+        $substitute = $condimentSubstituteRepository->find($substituteId);
 
-    if ($substitute && $this->isCsrfTokenValid(
-        'delete_substitute' . $substitute->getId(),
-        $request->getPayload()->getString('_token')
-    )) {
-        // 削除する前に、このグループを覚えておく
-        $group = $substitute->getCondimentSubstituteGroup();
+        if ($substitute && $this->isCsrfTokenValid(
+            'delete_substitute' . $substitute->getId(),
+            $request->getPayload()->getString('_token')
+        )) {
+            // 削除する前に、このグループを覚えておく
+            $group = $substitute->getCondimentSubstituteGroup();
 
-        $entityManager->remove($substitute);
-        $entityManager->flush();
-
-        // 削除した結果、グループの中の代替品が0件になったら、空のグループも一緒に消す
-        if ($group->getCondimentSubstitutes()->count() === 0) {
-            $entityManager->remove($group);
+            $entityManager->remove($substitute);
             $entityManager->flush();
-        }
-    }
 
-    return $this->redirectToRoute('app_condiment_edit', ['id' => $condiment->getId()], Response::HTTP_SEE_OTHER);
-}
+            // 削除した結果、グループの中の代替品が0件になったら、空のグループも一緒に消す
+            if ($group->getCondimentSubstitutes()->count() === 0) {
+                $entityManager->remove($group);
+                $entityManager->flush();
+            }
+        }
+
+        return $this->redirectToRoute('app_condiment_edit', ['id' => $condiment->getId()], Response::HTTP_SEE_OTHER);
+    }
 }

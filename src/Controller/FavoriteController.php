@@ -19,6 +19,7 @@ final class FavoriteController extends AbstractController
     public function index(FavoriteRepository $favoriteRepository): Response
     {
         $favorites = $favoriteRepository->findBy(['user' => $this->getUser()]);
+
         return $this->render('favorite/index.html.twig', [
             'favorites' => $favorites,
             'totalCount' => count($favorites),
@@ -52,11 +53,16 @@ final class FavoriteController extends AbstractController
             $favorite->setPerson($personCount);
             $entityManager->persist($favorite);
             $entityManager->flush();
+
+            // メイン写真（stepOrderがnullのもの）を取得
+            $mainPhoto = $recipe->getMedia()->filter(fn($m) => $m->getStepOrder() === null)->first();
+
             // 「お気に入りに追加されたレシピの情報」を、次の1回だけ表示するために保存しておく
             $this->addFlash('favori_added', [
                 'id' => $recipe->getid(),
                 'name' => $recipe->getName(),
                 'personCount' => $personCount,
+                'photoUrl' => $mainPhoto ? $mainPhoto->getUrl() : null,
             ]);
         }
 

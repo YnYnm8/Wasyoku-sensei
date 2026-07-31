@@ -39,11 +39,17 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
-    # Note: Only the *first* matching rule is applied
+   # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
-
+        - { path: ^/recipe/admin, roles: ROLE_ADMIN }
+        - { path: ^/recipe/new, roles: ROLE_ADMIN }
+        - { path: ^/recipe/\d+/edit, roles: ROLE_ADMIN }
+        - { path: ^/recipe/\d+/(ingredient|condiment|media)/, roles: ROLE_ADMIN }
+        - { path: ^/condiment/admin, roles: ROLE_ADMIN }
+        - { path: ^/condiment/new, roles: ROLE_ADMIN }
+        - { path: ^/condiment/\d+/edit, roles: ROLE_ADMIN }
+        - { path: ^/condiment/\d+/substitute, roles: ROLE_ADMIN }
+       
 when@test:
     security:
         password_hashers:

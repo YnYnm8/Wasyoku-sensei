@@ -3,11 +3,18 @@
 {% block title %}Mes Favoris{% endblock %}
 
 {% block body %}
-<div>
-    <span>{{ totalCount }} RECETTES</span>
-</div>
+	<div class="px-6 pb-6">
+		<div class="flex items-center justify-between">
+			<h2 class="font-display text-xl">わたしのお気に入り</h2>
+			<span class="w-4 h-4 bg-washoku-red "></span>
+		</div>
+		<p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Mes favoris</p>
+    <span class="font-display text-ms">{{ totalCount }} RECETTES</span>
+	</div>
 
-<div class="grid grid-cols-3 gap-4">
+
+
+	<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
     {% for favorite in favorites %}
         <div>
             <label>
@@ -23,6 +30,7 @@
         <p>Vous n'avez pas encore de recette favorite.</p>
     {% endfor %}
 </div>
+
 
 {% if favorites|length > 0 %}
     <form method="post" action="{{ path('app_shopping_list_create') }}" id="shopping-list-form">
@@ -43,6 +51,7 @@
             hidden.name = 'recipe_ids[]';
             hidden.value = checkbox.value;
             this.appendChild(hidden);
+            // JavaScriptで、チェックされているチェックボックスだけを探し出す。そのチェックボックス1つ1つに対して、recipe_ids[]という名前を持つ、非表示の入力欄を新しく作り、それを送信直前のフォームの中に追加する
         }, this);
     });
 </script>

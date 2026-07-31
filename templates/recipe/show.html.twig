@@ -1,117 +1,130 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ recipe.name }}{% endblock %}
+{% block title %}
+	{{ recipe.name }}
+{% endblock %}
 {% block body %}
-<div>
-    {% set mainPhoto = recipe.media|filter(m => m.stepOrder is null)|first %}
-    {% if mainPhoto %}
-        <img src="{{ mainPhoto.url }}" alt="{{ recipe.name }}" class="w-full h-64 object-cover">
-    {% endif %}
+	<div>
+		{% set mainPhoto = recipe.media|filter(m => m.stepOrder is null)|first %}
+		{% if mainPhoto %}
+			<img src="{{ mainPhoto.url }}" alt="{{ recipe.name }}" class="w-full h-64 object-cover">
+		{% endif %}
 
-    <div class="p-4">
-        <h1 class="font-display text-2xl">{{ recipe.name }}</h1>
-        <p class="text-sm text-gray-500">{{ recipe.time }} — {{ recipe.level.label }} — {{ recipe.season.label }}</p>
-    </div>
-</div>
+		<div class="p-4">
+			<h1 class="font-display text-2xl">{{ recipe.name }}</h1>
+			<p class="text-sm text-gray-500">{{ recipe.time }}
+				—
+				{{ recipe.level.label }}
+				—
+				{{ recipe.season.label }}</p>
+		</div>
+	</div>
 
-    <div class="p-4">
-    <div class="flex items-center justify-between">
-        <h2 class="font-display text-lg">材料</h2>
-        <span class="w-4 h-4 bg-washoku-red "></span>
-    </div>
-    <p class="text-sm text-gray-500">INGREDIENTS POUR</p>
+	<div class="p-4">
+		<div class="flex items-center justify-between">
+			<h2 class="font-display text-lg">材料</h2>
+			<span class="w-4 h-4 bg-washoku-red "></span>
+		</div>
+		<p class="text-sm text-gray-500">INGREDIENTS POUR</p>
 
-    <div class="flex items-center gap-3 bg-white rounded-2xl shadow p-3 my-4 w-fit">
-        <button id="decrease-btn" type="button" class="w-10 h-10 rounded-full border border-washoku-beige flex items-center justify-center">−</button>
-        <span id="person-count" class="text-2xl w-8 text-center">1</span>
-        <button id="increase-btn" type="button" class="btn-icon-round">＋</button>
-        <span class="bg-washoku-beige text-gray-600 text-xs px-3 py-2 rounded-full">PERSONNES</span>
-    </div>
+		<div class="flex items-center gap-3 bg-white rounded-2xl shadow p-3 my-4 w-fit">
+			<button id="decrease-btn" type="button" class="w-10 h-10 rounded-full border border-washoku-beige flex items-center justify-center">−</button>
+			<span id="person-count" class="text-2xl w-8 text-center">1</span>
+			<button id="increase-btn" type="button" class="btn-icon-round">＋</button>
+			<span class="bg-washoku-beige text-gray-600 text-xs px-3 py-2 rounded-full">PERSONNES</span>
+		</div>
 
-    <ul>
-        {% for ri in recipe.recipeIngredients %}
-            <li data-base-quantity="{{ ri.quantity }}" class="flex items-center justify-between border-b border-washoku-beige py-3">
-                <span>{{ ri.ingredient.name }}</span>
-                <span class="quantity font-semibold text-washoku-red">{{ ri.quantity }}</span>
-                <span class="font-semibold text-washoku-red">{{ ri.unit }}</span>
-            </li>
-        {% endfor %}
-    </ul>
+		<ul>
+			{% for ri in recipe.recipeIngredients %}
+				<li data-base-quantity="{{ ri.quantity }}" class="flex items-center justify-between border-b border-washoku-beige py-3">
+					<span>{{ ri.ingredient.name }}</span>
+					<span class="quantity font-semibold text-washoku-red">{{ ri.quantity }}</span>
+					<span class="font-semibold text-washoku-red">{{ ri.unit }}</span>
+				</li>
+			{% endfor %}
+		</ul>
 
-    <div>
-        <ul>
-            {% for rc in recipe.recipeCondiments %}
-                <li data-base-quantity="{{ rc.quantity }}" class="flex items-center justify-between border-b border-washoku-beige py-3">
-                    <span class="flex items-center gap-2">
-                        {{ rc.condiment.name }}
-                        {% if rc.condiment.condimentSubstituteGroups|length > 0 %}
-                            <button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').showModal()" class="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-full ">
-                                代用品をみる　Substitut possible
-                            </button>
-                        {% endif %}
-                    </span>
-                    <span class="quantity font-semibold text-washoku-red">{{ rc.quantity }}</span>
-                    <span class="font-semibold text-washoku-red">{{ rc.unit }}</span>
+		<div>
+			<ul>
+				{% for rc in recipe.recipeCondiments %}
+					<li data-base-quantity="{{ rc.quantity }}" class="flex items-center justify-between border-b border-washoku-beige py-3">
+						<span class="flex items-center gap-2">
+							{{ rc.condiment.name }}
+							{% if rc.condiment.condimentSubstituteGroups|length > 0 %}
+								<button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').showModal()" class="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-full ">
+									代用品をみる　Substitut possible
+								</button>
+							{% endif %}
+						</span>
+						<span class="quantity font-semibold text-washoku-red">{{ rc.quantity }}</span>
+						<span class="font-semibold text-washoku-red">{{ rc.unit }}</span>
 
-                    {% if rc.condiment.condimentSubstituteGroups|length > 0 %}
-                        <dialog id="dialog-{{ rc.condiment.id }}" class="card-popup">
-                            <p>Pas de {{ rc.condiment.name }}？</p>
-                            <ul>
-                                {% for group in rc.condiment.condimentSubstituteGroups %}
-                                    <li>{{ group.label }}</li>
-                                {% endfor %}
-                            </ul>
-                            <button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').close()" class="btn-primary">Valider</button>
-                        </dialog>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
+						{% if rc.condiment.condimentSubstituteGroups|length > 0 %}
+							<dialog id="dialog-{{ rc.condiment.id }}" class="card-popup">
+								<div class="popup-icon-circle">🍶</div>
+								<p class="popup-title">Pas de {{ rc.condiment.name }}？</p>
+								<p class="popup-subtitle">SUBSTITUTION -
+									{{ rc.condiment.name }}</p>
 
-<div class="p-4">
-    <div class="flex items-center justify-between">
-        <h2 class="font-display text-lg">作り方</h2>
-        <span class="w-4 h-4 bg-washoku-red "></span>
-    </div>
-    <p class="text-sm text-gray-500">PRÉPARATION</p>
+								{% for group in rc.condiment.condimentSubstituteGroups %}
+									<div class="popup-info-box">
+										<p class="popup-info-label">SUBSTITUTION -
+											{{ loop.index }}</p>
+										<p class="popup-info-value">{{ group.label }}</p>
+									</div>
+								{% endfor %}
 
-    <div class="mt-4 space-y-4">
-        {% for media in recipe.media|filter(m => m.stepOrder is not null)|sort((a, b) => a.stepOrder <=> b.stepOrder) %}
-            <div class="flex items-center gap-4 border-b border-washoku-beige pb-4">
-                <span class="text-washoku-red font-display text-2xl w-8">{{ '%02d'|format(media.stepOrder) }}</span>
-                <img src="{{ media.url }}" alt="{{ media.stepDescription }}" class="w-36 h- object-cover rounded-lg flex-shrink-0">
-                <div>
-                    <p class="font-semibold">{{ media.stepDescription }}</p>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-</div>
+								<button type="button" onclick="document.getElementById('dialog-{{ rc.condiment.id }}').close()" class="btn-primary">Valider</button>
+							</dialog>
+						{% endif %}
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
 
-{% if app.user %}
-    {% if recipe.id in favoriteRecipeIds %}
-        <form method="post" action="{{ path('app_favorite_remove', {id: recipe.id}) }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete_favorite' ~ recipe.id) }}">
-            <button type="submit" class="btn-secondary">♥</button>
-        </form>
-    {% else %}
-        <form method="post" action="{{ path('app_favorite_add', {id: recipe.id}) }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('add_favorite' ~ recipe.id) }}">
-            <input type="hidden" name="person_count" id="person-count-input" value="1">
-            <button type="submit" class="btn-secondary gap-5"> ♡ Ajouter aux favoris</button>
-        </form>
-    {% endif %}
-{% endif %}
+	<div class="p-4">
+		<div class="flex items-center justify-between">
+			<h2 class="font-display text-lg">作り方</h2>
+			<span class="w-4 h-4 bg-washoku-red "></span>
+		</div>
+		<p class="text-sm text-gray-500">PRÉPARATION</p>
 
-{% if is_granted('ROLE_ADMIN') %}
-    <a href="{{ path('app_recipe_edit', {id: recipe.id}) }}" class="btn-primary">Éditer</a>
-{% endif %}
+		<div class="mt-4 space-y-4">
+			{% for media in recipe.media|filter(m => m.stepOrder is not null)|sort((a, b) => a.stepOrder <=> b.stepOrder) %}
+				<div class="flex items-center gap-4 border-b border-washoku-beige pb-4">
+					<span class="text-washoku-red font-display text-2xl w-8">{{ '%02d'|format(media.stepOrder) }}</span>
+					<img src="{{ media.url }}" alt="{{ media.stepDescription }}" class="w-36 h- object-cover rounded-lg flex-shrink-0">
+					<div>
+						<p class="font-semibold">{{ media.stepDescription }}</p>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
 
-<a href="{{ path('app_recipe_index') }}">back to list</a>
+	{% if app.user %}
+		{% if recipe.id in favoriteRecipeIds %}
+			<form method="post" action="{{ path('app_favorite_remove', {id: recipe.id}) }}">
+				<input type="hidden" name="_token" value="{{ csrf_token('delete_favorite' ~ recipe.id) }}">
+				<button type="submit" class="btn-secondary">♥</button>
+			</form>
+		{% else %}
+			<form method="post" action="{{ path('app_favorite_add', {id: recipe.id}) }}">
+				<input type="hidden" name="_token" value="{{ csrf_token('add_favorite' ~ recipe.id) }}">
+				<input type="hidden" name="person_count" id="person-count-input" value="1">
+				<button type="submit" class="btn-secondary gap-5">
+					♡ Ajouter aux favoris</button>
+			</form>
+		{% endif %}
+	{% endif %}
 
-{% if is_granted('ROLE_ADMIN') %}
-    {{ include('recipe/_delete_form.html.twig') }}
-{% endif %}
+	{% if is_granted('ROLE_ADMIN') %}
+		<a href="{{ path('app_recipe_edit', {id: recipe.id}) }}" class="btn-primary">Éditer</a>
+	{% endif %}
+
+
+	{% if is_granted('ROLE_ADMIN') %}
+		{{ include('recipe/_delete_form.html.twig') }}
+	{% endif %}
 
 {% endblock %}

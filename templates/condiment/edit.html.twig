@@ -4,7 +4,7 @@
 {% block title %}Edit Condiment{% endblock %}
 
 {% block admin_breadcrumb %}
-    <a href="{{ path('app_condiment_index') }}" class="text-washoku-inputtext hover:text-white text-sm">
+    <a href="{{ path('app_condiment_admin_index') }}"class="text-washoku-inputtext hover:text-white text-sm">
         ‹ 調味料編集
     </a>
     <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">/admin/condiments/{{ condiment.id }}/edit</p>
@@ -16,6 +16,13 @@
         <h2 class="font-display text-lg mb-4">基本情報・Informations</h2>
         {{ include('condiment/_form.html.twig', {'button_label': '基本情報を保存'}) }}
     </div>
+
+    {% if condiment.imageUrl %}
+        <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
+            <h2 class="font-display text-lg mb-4">現在の写真・Photo actuelle</h2>
+            <img src="{{ condiment.imageUrl }}" alt="{{ condiment.name }}" class="w-full max-w-xs rounded-lg object-cover">
+        </div>
+    {% endif %}
 
     <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
         <div class="flex items-center justify-between mb-4">
@@ -98,6 +105,6 @@
         </form>
     </dialog>
 
-{% endblock %}
+    {{ include('condiment/_delete_form.html.twig') }}
 
-{{ include('condiment/_delete_form.html.twig') }}
+{% endblock %}

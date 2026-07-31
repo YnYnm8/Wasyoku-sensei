@@ -1,4 +1,63 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+
+    <div>
+        <label class="block font-display text-sm mb-1">調味料名・Nom</label>
+        {{ form_widget(form.name, {
+            'attr': {'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">説明・Explication</label>
+        {{ form_widget(form.explanation, {
+            'attr': {'rows': 3, 'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">成分・Composition</label>
+        {{ form_widget(form.composition, {
+            'attr': {'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">使用方法・Utilisation</label>
+        {{ form_widget(form.use, {
+            'attr': {'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">備考・Note</label>
+        {{ form_widget(form.note, {
+            'attr': {'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white'}
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">購入先URL・Où acheter</label>
+        {{ form_widget(form.url, {
+            'attr': {
+                'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white',
+                'placeholder': 'https://www.amazon.fr/...'
+            }
+        }) }}
+    </div>
+
+    <div>
+        <label class="block font-display text-sm mb-1">画像パス・Photo</label>
+        {{ form_widget(form.imageUrl, {
+            'attr': {
+                'class': 'w-full rounded-lg border border-washoku-beige px-3 py-2 text-gray-800 bg-white',
+                'placeholder': '/images/condiments/soja.jpg'
+            }
+        }) }}
+    </div>
+
+    <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary">{{ button_label|default('保存する・Enregistrer') }}</button>
+        <a href="{{ path('app_condiment_admin_index') }}" class="btn-secondary text-center">キャンセル</a>
+    </div>
+
 {{ form_end(form) }}

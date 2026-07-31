@@ -1,33 +1,52 @@
-
 {% extends 'base.html.twig' %}
 {% block title %}Recipe index
 {% endblock %}
 {% block body %}
 
-	<div>
-		<p>{{ totalCount }}</p>
-		<p>RECETTE TOTAL</p>
-		<p>全{{ totalCount }}品</p>
+	<div class="px-6 pb-6">
+		<h2 class="font-display text-2xl">レシピ一覧</h2>
+		<p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Tout les recettes</p>
+		<p class="font-display text-sm">RECETTE TOTAL    全{{ totalCount }}品</p>
 	</div>
 
-<div class="grid grid-cols-3 gap-4">
-    {% for recipe in recipes %}
-        {% include 'recipe/_card.html.twig' with {
+	{# 食材で探す #}
+	<div class="mt-6 mb-8">
+		<h2 class="font-display text-lg">PAR INGRÉDIENTS</h2>
+		<p class="text-sm text-gray-500">食材で探す</p>
+		<form method="get" action="{{ path('app_recipe_index') }}" class="flex gap-2 mt-2">
+			<input type="text" name="ingredients" placeholder="Rechercher un ingrédient, une recette..." class="flex-1 border border-washoku-beige rounded-lg px-3 py-2">
+			<button type="submit" class="btn-primary !w-auto px-6">Rechercher</button>
+		</form>
+	</div>
+
+	<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+		{% for recipe in recipes %}
+			{% include 'recipe/_card.html.twig' with {
             recipe: recipe,
             favoriteRecipeIds: favoriteRecipeIds
         } %}
-    {% else %}
-        <p>no records found</p>
-    {% endfor %}
-</div>
-
+		{% else %}
+			<p>no records found</p>
+		{% endfor %}
+	</div>
 	<div class="flex gap-2 justify-center mt-4">
 		{% for i in 1..totalPages %}
 			{# 1..totalPagesは、配列ではなく、「1から、totalPagesまでの数字を、その場で新しく作ってください」という指示です。 #}
-			<a href="{{ path('app_recipe_index', {'page': i}) }}" class="{% if i == currentPage %}font-bold underline{% endif %}">
+			<a href="{{ path('app_recipe_index', {'page': i}) }}" class="w-10 h-10 flex items-center justify-center rounded-xl font-semibold transition
+					                  {% if i == currentPage %}
+					                      bg-washoku-red text-white
+					                  {% else %}
+					                      bg-white border border-washoku-beige text-gray-700 hover:bg-washoku-cream
+					                  {% endif %}">
 				{{ i }}
 			</a>
 		{% endfor %}
+
+		{% if currentPage < totalPages %}
+			<a href="{{ path('app_recipe_index', {'page': currentPage + 1}) }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-washoku-beige text-gray-700 hover:bg-washoku-cream transition">
+				›
+			</a>
+		{% endif %}
 	</div>
 
 	{% if is_granted('ROLE_ADMIN') %}
