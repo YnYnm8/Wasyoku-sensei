@@ -2,421 +2,269 @@
 
 namespace App\Controller;
 
-use App\Entity\Recipe;
-use App\Form\RecipeType;
+use App\Repository\FavoriteRepository;
+use App\Repository\RecipeCondimentRepository;
+use App\Repository\RecipeIngredientRepository;
 use App\Repository\RecipeRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Enum\RecipeLevel;
-use App\Enum\RecipeMainCategory;
-use App\Enum\RecipeSeason;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use App\Entity\Ingredient;
-use App\Entity\RecipeIngredient;
-use App\Repository\IngredientRepository;
-use App\Repository\RecipeIngredientRepository;
-use App\Repository\RecipeCondimentRepository;
-use App\Entity\RecipeCondiment;
-use App\Repository\CondimentRepository;
-use App\Repository\FavoriteRepository;
-use App\Entity\Media;
-use App\Repository\MediaRepository;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
-
-#[Route('/recipe')]
-final class RecipeController extends AbstractController
+final class ShoppingListController extends AbstractController
 {
-    #[Route(name: 'app_recipe_index', methods: ['GET'])]
-    public function index(RecipeRepository $recipeRepository, Request $request, FavoriteRepository $favoriteRepository): Response
+    // ① favorite/index.html.twig の「Créer la liste de courses」から呼ばれる
+    // 選んだレシピIDだけを、セッションに保存する
+    /**
+     * Step 1: called from the "Créer la liste de courses" button on the
+     * favorites page. Stores the selected recipe IDs in the session only
+     * (no database write yet).
+     */
+    #[Route('/shopping-list/create', name: 'app_shopping_list_create', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function create(Request $request, SessionInterface $session): Response
     {
-        $favoriteRecipeIds = [];
-        if ($this->getUser()) {
-            $favorites = $favoriteRepository->findBy(['user' => $this->getUser()]);
-            // $favorites の中身を、1個ずつ順番に取り出しながら処理する
-            foreach ($favorites as $favorite) {
-                $favoriteRecipeIds[] = $favorite->getRecipe()->getId();
-            }
-        }
-        // 現在の「ページ番号」をURLから受け取る（例: ?page=2）
-        // 指定が無ければ、1ページ目とする
-        $page = $request->query->getInt('page', 1);
-        $limit = 3;
+        // フォームから送られてきた、recipe_idsという名前のデータを、配列として取り出す
+        $recipeIds = $request->request->all('recipe_ids');
+        // 「今受け取った、その数字の配列を、セッション（一時的な保管庫）に、覚えさせておく」という意味です。
+        $session->set('shopping_list_recipe_ids', $recipeIds);
 
-
-        // ① URLから値を受け取る（$request->query->get()）
-        $level = $request->query->get('level');
-        $main = $request->query->get('mainCategory');
-        $season = $request->query->get('season');
-        $ingredients = $request->query->get('ingredients');
-
-        if ($level) {
-            // ② 文字列をEnumに変換する（RecipeLevel::from()）
-            // RecipeLevelクラス自体に対して from() を呼び出し、文字列'easy'を、
-            // 対応するEnum（RecipeLevel::EASY）に変換する
-            // ::が「実物を作らずに、設計図（クラス）そのものに直接アクセスする記号」
-            $levelEnum = RecipeLevel::from($level);
-
-            // ③ Repositoryで検索する（findBy()）
-            $recipes = $recipeRepository->findBy(['level' => $levelEnum], null, $limit, ($page - 1) * $limit);
-
-            // 「1つの条件」で完結する、シンプルな検索　 （DBに直接、件数を聞くことができる）
-            $totalCount = $recipeRepository->count(['level' => $levelEnum]);
-        } elseif ($main) {
-            $mainEnum = RecipeMainCategory::from($main);
-            $recipes = $recipeRepository->findBy(['mainCategory' => $mainEnum], null, $limit, ($page - 1) * $limit);
-            $totalCount = $recipeRepository->count(['mainCategory' => $mainEnum]);
-        } elseif ($season) {
-            $seasonEnum = RecipeSeason::from($season);
-            // ($page-1) * $limitこれは一ページのときには0件目からという計算
-            $recipes = $recipeRepository->findBy(['season' => $seasonEnum], null, $limit, ($page - 1) * $limit);
-            $totalCount = $recipeRepository->count(['season' => $seasonEnum]);
-        } elseif ($ingredients) {
-            // explode(区切り文字, 分解したい文字列)
-            // 1つのまとまった文字列を、指定した記号の場所で粉々に分解して、
-            // 配列（複数の部品）にする関数です
-            $ingredientArray = explode(' ', $ingredients);
-            // 分解してできた配列を、Repositoryの検索専用関数に渡す
-            $allrecipes = $recipeRepository->findByIngredientNames($ingredientArray);
-            // 「複数のテーブルをまたぐ」、複雑な検索（DBに、直接「複雑な条件の件数」を聞く機能が無いので、一度取得してから、手元で数えるしかない）
-            $totalCount = count($allrecipes);
-            $recipes = array_slice($allrecipes, ($page - 1) * $limit, $limit);
-        } else {
-            $allrecipes = $recipeRepository->findAll();
-            $totalCount = count($allrecipes);
-            $recipes = array_slice($allrecipes, ($page - 1) * $limit, $limit);
-        }
-
-        // ページの全体数をそのページに載せる数でわり、それを整数（INT）にしてね。それが全体の数だよということになります・ceil( 2.333... )→ 3.0（切り上げられた、でもまだfloat型）
-        $totalPages = (int)ceil($totalCount / $limit);
-        return $this->render('recipe/index.html.twig', [
-            // ④ Twigに渡して表示する
-            'recipes' => $recipes,
-            'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'totalCount' => $totalCount,
-            'favoriteRecipeIds' => $favoriteRecipeIds,
-        ]);
+        return $this->redirectToRoute('app_shopping_list_new');
     }
 
-    // US1.3 CA1・CA3・CA4：ROLE_ADMINのみアクセス可能
-    // 新しいレシピを、基本情報（name, description, season, time, level, mainCategory）だけで作成するアクション
-    // 材料・調味料はここでは扱わない。作成後に編集ページへ移動してから追加する
-    #[Route('/new', name: 'app_recipe_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    // ② shopping_list/new.html.twig の「Valider ma liste」から呼ばれる
+    // チェック内容・メモを、セッションに保存する
+    /**
+     * Step 2: called from the "Valider ma liste" button. Stores the checked
+     * items and the free-text memo in the session, then redirects to the
+     * confirmation screen (Post/Redirect/Get pattern).
+     */
+    #[Route('/shopping-list/confirm', name: 'app_shopping_list_confirm', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function confirm(Request $request, SessionInterface $session): Response
     {
-        // 中身が空のRecipeオブジェクトを、まずメモリ上に作る（この時点ではまだDBに保存されていない）
-        $recipe = new Recipe();
-        $form = $this->createForm(RecipeType::class, $recipe);
-        $form->handleRequest($request);
+        // 各レシピの「含めるか」チェック状態を、まとめて受け取る
+        // （include_recipe_1, include_recipe_23 のように、レシピIDごとに名前が違うので、
+        //   $request->request->all() で、送られてきた"全部"を、一旦受け取る）
+        $allData = $request->request->all();
+        // これはメモがなかったら、空の配列として送ってください、という意味
+        $memo = $request->request->get('memo', '');
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // persist()は「これから保存するよ」とDoctrineに伝えるだけで、まだDBには書き込まれない
-            $entityManager->persist($recipe);
-            // flush()を呼んだ瞬間に、実際にINSERT文が発行され、$recipeにIDが自動で割り振られる
-            $entityManager->flush();
+        // セッションに、今回チェックされた内容・メモを保存する
+        $session->set('shopping_confirm_allData', $allData);
 
-            // CA4：作成後は一覧ではなく、そのレシピの編集ページへ自動遷移する
-            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('recipe/new.html.twig', [
-            'recipe' => $recipe,
-            'form' => $form,
-        ]);
-    }
-    // US1.3：管理者専用のレシピ一覧（訪問者向けのindex()とは別に用意）
-    // フィルターやお気に入り機能は不要。全件を編集・削除しやすい形で並べるだけ
-    #[Route('/admin', name: 'app_recipe_admin_index', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function adminIndex(RecipeRepository $recipeRepository): Response
-    {
-        $recipes = $recipeRepository->findAll();
-
-        return $this->render('recipe/admin_index.html.twig', [
-            'recipes' => $recipes,
-        ]);
+        return $this->redirectToRoute('app_shopping_list_confirm_show');
     }
 
-    // 訪問者・管理者どちらもアクセス可能（保護なし）
-    #[Route('/{id}', name: 'app_recipe_show', methods: ['GET'])]
-    public function show(Recipe $recipe, FavoriteRepository $favoriteRepository): Response
-    {
-        $favoriteRecipeIds = [];
-        if ($this->getUser()) {
-            $favorites = $favoriteRepository->findBy(['user' => $this->getUser()]);
-            foreach ($favorites as $favorite) {
-                $favoriteRecipeIds[] = $favorite->getRecipe()->getId();
-            }
-        }
-        return $this->render('recipe/show.html.twig', [
-            'recipe' => $recipe,
-            'favoriteRecipeIds' => $favoriteRecipeIds,
-        ]);
-    }
-
-    // US1.3（暗黙のDelete要件）：ROLE_ADMINのみアクセス可能
-    // CSRFトークンを検証してから削除することで、外部サイトから勝手に削除リクエストを送られるのを防ぐ
-    #[Route('/{id}', name: 'app_recipe_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function delete(Request $request, Recipe $recipe, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete' . $recipe->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($recipe);
-            $entityManager->flush();
-        }
-
-        // レシピ自体が消えるので、編集ページには戻さず一覧ページへ
-        return $this->redirectToRoute('app_recipe_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-    // US1.3 CA5・CA6：ROLE_ADMINのみアクセス可能
-    // 基本情報の編集フォームに加えて、材料一覧（ingredients）もTwigに渡し、
-    // 同じページ内の<dialog>で使う「既存材料の候補リスト」として使う
-    #[Route('/{id}/edit', name: 'app_recipe_edit', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function edit(
-        Request $request,
-        Recipe $recipe,
-        EntityManagerInterface $entityManager,
-        IngredientRepository $ingredientRepository,
-        CondimentRepository $condimentRepository
-    ): Response {
-        $form = $this->createForm(RecipeType::class, $recipe);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // 既にDB上に存在するRecipeを更新するだけなので、persist()は不要でflush()だけでよい
-            $entityManager->flush();
-            // CA6：保存後は一覧に飛ばさず、同じ編集ページに留まる（材料・調味料を続けて追加できるように）
-            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('recipe/edit.html.twig', [
-            'recipe' => $recipe,
-            'form' => $form,
-            // <datalist>で使う、既存材料の名前候補
-            'ingredients' => $ingredientRepository->findAll(),
-            'condiments' => $condimentRepository->findAll(),
-        ]);
-    }
-
-    // US1.3 CA7・CA8・CA9：ROLE_ADMINのみアクセス可能
-    // レシピ編集ページの<dialog>フォームから送信される、材料の追加処理
-    // PRG（Post/Redirect/Get）パターン：処理後は同じ編集ページへリダイレクトし、
-    // ページの再読み込み時に最新の材料一覧が反映される（＝CA9の「その場で更新」を実現する方法）
-    #[Route('/{id}/ingredient/add', name: 'app_recipe_ingredient_add', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function addIngredient(
-        Request $request,
-        Recipe $recipe,
-        EntityManagerInterface $entityManager,
-        IngredientRepository $ingredientRepository
-    ): Response {
-        // フォームから送信された値を受け取る。trim()で前後の余計な空白を除去
-        $name = trim($request->request->get('ingredient_name', ''));
-        $quantity = $request->request->get('quantity');
-        $unit = trim($request->request->get('unit', ''));
-
-        // 必須項目が空なら何もせず編集ページへ戻す（簡易バリデーション）
-        if ($name === '' || $quantity === null || $unit === '') {
-            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()]);
-        }
-
-        // CA8の核心：入力された名前の材料が既にDBにあるか探す
-        $ingredient = $ingredientRepository->findOneBy(['name' => $name]);
-
-        if (!$ingredient) {
-            // 見つからなければ、新しいIngredientをその場で作成する
-            $ingredient = new Ingredient();
-            $ingredient->setName($name);
-            $entityManager->persist($ingredient);
-        }
-
-        // レシピと材料を、分量・単位付きで結びつける中間テーブルのレコードを作成
-        $recipeIngredient = new RecipeIngredient();
-        $recipeIngredient->setRecipe($recipe);
-        $recipeIngredient->setIngredient($ingredient);
-        $recipeIngredient->setQuantity((float) $quantity);
-        $recipeIngredient->setUnit($unit);
-
-        $entityManager->persist($recipeIngredient);
-        // ここで初めて、新規Ingredient（あれば）とRecipeIngredientの両方がDBに書き込まれる
-        $entityManager->flush();
-
-        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
-    }
-
-    // US1.3 CA10：ROLE_ADMINのみアクセス可能
-    // レシピから特定の材料（RecipeIngredient）を1件だけ取り除く処理
-    // Ingredientマスター自体は削除しない（他のレシピでも使われている可能性があるため、消すのは中間テーブルの行だけ）
-    #[Route('/{id}/ingredient/{recipeIngredientId}/delete', name: 'app_recipe_ingredient_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function deleteIngredient(
-        Request $request,
-        Recipe $recipe,
-        int $recipeIngredientId,
-        EntityManagerInterface $entityManager,
-        RecipeIngredientRepository $recipeIngredientRepository
-    ): Response {
-        $recipeIngredient = $recipeIngredientRepository->find($recipeIngredientId);
-
-        // CSRFトークンが正しい場合のみ削除を実行（確認ダイアログ＋不正リクエスト対策）
-        if ($recipeIngredient && $this->isCsrfTokenValid(
-            'delete_ingredient' . $recipeIngredient->getId(),
-            $request->getPayload()->getString('_token')
-        )) {
-            $entityManager->remove($recipeIngredient);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
-    }
-    // US1.3 CA11・CA12・CA13：ROLE_ADMINのみアクセス可能
-    // 調味料は既にCondimentとして管理されている前提なので、材料と違い「新規作成」は行わず、
-    // 既存のCondimentを選んでRecipeに紐付けるだけのシンプルな処理になる
-    #[Route('/{id}/condiment/add', name: 'app_recipe_condiment_add', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function addCondiment(
-        Request $request,
-        Recipe $recipe,
-        EntityManagerInterface $entityManager,
-        CondimentRepository $condimentRepository
-    ): Response {
-        $condimentId = $request->request->get('condiment_id');
-        $quantity = $request->request->get('quantity');
-        $unit = trim($request->request->get('unit', ''));
-
-        if (!$condimentId || $quantity === null || $unit === '') {
-            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()]);
-        }
-
-        // 既存のCondimentをIDで取得する（見つからなければnullが返る）
-        $condiment = $condimentRepository->find($condimentId);
-
-        if (!$condiment) {
-            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()]);
-        }
-
-        $recipeCondiment = new RecipeCondiment();
-        $recipeCondiment->setRecipe($recipe);
-        $recipeCondiment->setCondiment($condiment);
-        $recipeCondiment->setQuantity((float) $quantity);
-        $recipeCondiment->setUnit($unit);
-
-        $entityManager->persist($recipeCondiment);
-        $entityManager->flush();
-
-        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
-    }
-
-    // US1.3 CA14：ROLE_ADMINのみアクセス可能
-    #[Route('/{id}/condiment/{recipeCondimentId}/delete', name: 'app_recipe_condiment_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function deleteCondiment(
-        Request $request,
-        Recipe $recipe,
-        int $recipeCondimentId,
-        EntityManagerInterface $entityManager,
+    // ③ セッションから、チェック内容・メモを取り出して、確認画面（Image 2相当）を表示する
+    // US6.2 CA1：材料・調味料を、レシピごとにグループ分けして表示するため、
+    // buildDisplayItems() という共通部品（下にあります）を使って、組み立てる
+    /**
+     * Step 3: reads the checked items and memo back from the session and
+     * displays the confirmation screen, grouped by recipe via
+     * buildDisplayItems() (US6.2 CA1).
+     */
+    #[Route('/shopping-list/confirm', name: 'app_shopping_list_confirm_show', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function confirmShow(
+        SessionInterface $session,
+        RecipeIngredientRepository $recipeIngredientRepository,
         RecipeCondimentRepository $recipeCondimentRepository
     ): Response {
-        $recipeCondiment = $recipeCondimentRepository->find($recipeCondimentId);
+        // セッションに保存しておいた、大きな配列（TWIGでINPUTにこのような名前がついているため）を、丸ごと取り出しています。
+        $allData = $session->get('shopping_confirm_allData', []);
+        // 「$allDataという配列の中に、'checked_items'というキーが、もし存在すれば、その値を使う。もし存在しなければ（nullのような扱いになるので）、代わりに、空の配列[]を使う」
+        // この ?? があることで、エラーの予防になる
+        $checkedItems = $allData['checked_items'] ?? [];
+        $memo = $allData['memo'] ?? '';
 
-        if ($recipeCondiment && $this->isCsrfTokenValid(
-            'delete_condiment' . $recipeCondiment->getId(),
-            $request->getPayload()->getString('_token')
-        )) {
-            $entityManager->remove($recipeCondiment);
-            $entityManager->flush();
-        }
+        // 以前は、ここに長い foreach を、直接書いていたが、
+        // buildDisplayItems() という部品にまとめたので、それを呼び出すだけで済む
+        $displayItems = $this->buildDisplayItems($checkedItems, $recipeIngredientRepository, $recipeCondimentRepository);
 
-        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
+        return $this->render('shopping_list/confirm.html.twig', [
+            'displayItems' => $displayItems,
+            'memo' => $memo,
+        ]);
     }
 
-    // メイン写真の追加（順番なし、レシピにつき通常1枚を想定）
-    #[Route('/{id}/media/main/add', name: 'app_recipe_main_photo_add', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function addMainPhoto(
-        Request $request,
-        Recipe $recipe,
-        EntityManagerInterface $entityManager
+    // ④ favorite/index.html.twig から選んだレシピの一覧を、人数調整UI付きで表示する画面
+    /**
+     * Display the recipes selected from the favorites page, with the
+     * person-count adjustment UI. Fetches Favorite records (not just
+     * Recipe) so the saved person count is available too.
+     */
+    #[Route('/shopping-list/new', name: 'app_shopping_list_new', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function new(
+        SessionInterface $session,
+        RecipeRepository $recipeRepository,
+        FavoriteRepository $favoriteRepository
     ): Response {
-        $url = trim($request->request->get('url', ''));
+        // セッションから、さっき保存しておいたレシピIDの配列を取り出す
+        // 万が一セッションに何も無ければ（直接このURLにアクセスした場合など）、空配列をデフォルトにする
+        $recipeIds = $session->get('shopping_list_recipe_ids', []);
 
-        if ($url === '') {
-            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()]);
-        }
+        // Recipeだけでなく、Favorite（人数の情報を持っている）を、まとめて取得する
+        // 「レシピのIDだけを追いかけるのではなく、"お気に入り"という、ユーザー・レシピ・人数がセットになった記録そのものを
+        // 取ってくることで、人数の情報も自然に手に入る」という考え方
+        $favorites = $favoriteRepository->createQueryBuilder('f')
+            ->where('f.user = :user')
+            ->andWhere('f.recipe IN (:recipeIds)')
+            ->setParameter('user', $this->getUser())
+            ->setParameter('recipeIds', $recipeIds)
+            ->getQuery()
+            ->getResult();
 
-        $media = new Media();
-        $media->setName($recipe->getName() . ' - photo principale');
-        $media->setUrl($url);
-        $media->setType('photo');
-        // stepOrderは設定しない（null のまま）＝ステップ写真と区別する目印
-        $media->setRecipe($recipe);
-
-        $entityManager->persist($media);
-        $entityManager->flush();
-
-        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
+        return $this->render('shopping_list/new.html.twig', [
+            'favorites' => $favorites,
+        ]);
     }
 
-    // 作り方のステップ写真を追加（順番はサーバー側で自動計算）
-    #[Route('/{id}/media/step/add', name: 'app_recipe_step_add', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function addStep(
+    // ⑤ 「Envoyer」ボタンから呼ばれる、メール送信アクション
+    // US6.2 CA3：入力されたメールアドレスへ、材料・調味料の一覧を、メールで送信する
+    // US6.2 CA2：「Inclure la recette」がチェックされているレシピは、作り方も本文に含める
+    /**
+     * Final step: sends the shopping list by e-mail (US6.2 CA3), to either
+     * the account's own address or a free-text address. Recipes checked as
+     * "Inclure la recette" also get their preparation steps in the body
+     * (US6.2 CA2). Nothing is persisted to the database; the e-mail itself
+     * acts as the history.
+     */
+    #[Route('/shopping-list/send', name: 'app_shopping_list_send', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function send(
         Request $request,
-        Recipe $recipe,
-        EntityManagerInterface $entityManager
+        SessionInterface $session,
+        MailerInterface $mailer,
+        RecipeIngredientRepository $recipeIngredientRepository,
+        RecipeCondimentRepository $recipeCondimentRepository,
+        RecipeRepository $recipeRepository
     ): Response {
-        $url = trim($request->request->get('url', ''));
-        $stepDescription = trim($request->request->get('step_description', ''));
+        $allData = $session->get('shopping_confirm_allData', []);
+        $checkedItems = $allData['checked_items'] ?? [];
 
-        if ($url === '' || $stepDescription === '') {
-            return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()]);
+        // confirmShow() と同じ部品を使って、材料・調味料を、レシピごとにグループ分けする
+        $displayItems = $this->buildDisplayItems($checkedItems, $recipeIngredientRepository, $recipeCondimentRepository);
+
+        $emailChoice = $request->request->get('email_choice');
+
+        // US6.2 CA3：メール送信先を、アカウントのメール、または、自由入力の別のメールから選ぶ
+        if ($emailChoice === 'account') {
+            $toAddress = $this->getUser()->getEmail();
+        } else {
+            $toAddress = $request->request->get('custom_email');
         }
 
-        // 既存のステップ写真（stepOrderがnullではないもの）を数えて、次の番号を自動で割り振る
-        $existingSteps = array_filter(
-            $recipe->getMedia()->toArray(),
-            fn(Media $m) => $m->getStepOrder() !== null
-        );
-        $nextOrder = count($existingSteps) + 1;
+        $bodyText = "Voici votre liste de courses :\n\n";
 
-        $media = new Media();
-        $media->setName('Étape ' . $nextOrder);
-        $media->setUrl($url);
-        $media->setType('photo');
-        $media->setStepOrder($nextOrder);
-        $media->setStepDescription($stepDescription);
-        $media->setRecipe($recipe);
+        // $recipeId => $group と書くことで、キー（レシピID）と、値（レシピ名・材料リスト）の、両方を受け取る
+        foreach ($displayItems as $recipeId => $group) {
+            $bodyText .= $group['recipeName'] . "\n";
+            foreach ($group['items'] as $item) {
+                $bodyText .= "- " . $item['name'] . " : " . $item['quantity'] . " " . $item['unit'] . "\n";
+            }
 
-        $entityManager->persist($media);
-        $entityManager->flush();
+            // もし「このレシピを含める」がチェックされていれば、作り方も、本文に追加する
+            if (isset($allData['include_recipe_' . $recipeId])) {
+                $recipe = $recipeRepository->find($recipeId);
+                if ($recipe) {
+                    $bodyText .= "\nstep : " . $recipe->getStep() . "\n";
+                }
+            }
 
-        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
+            $bodyText .= "\n";
+        }
+
+        $email = (new Email())
+            ->from('meikotoulouse0726@gmail.com')
+            ->to($toAddress)
+            ->subject('Votre liste de courses - Wasyoku Sensei')
+            ->text($bodyText);
+
+        $mailer->send($email);
+
+        // US6.2 CA4：送信完了メッセージを、次の画面で、ポップアップとして表示するための、フラッシュメッセージ
+        $this->addFlash('shopping_list_sent', true);
+
+        return $this->redirectToRoute('app_shopping_list_confirm_show');
     }
-    #[Route('/{id}/media/{mediaId}/delete', name: 'app_recipe_media_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function deleteMedia(
-        Request $request,
-        Recipe $recipe,
-        int $mediaId,
-        EntityManagerInterface $entityManager,
-        MediaRepository $mediaRepository
-    ): Response {
-        $media = $mediaRepository->find($mediaId);
 
-        if ($media && $this->isCsrfTokenValid(
-            'delete_media' . $media->getId(),
-            $request->getPayload()->getString('_token')
-        )) {
-            $entityManager->remove($media);
-            $entityManager->flush();
+    // confirmShow() と send() の、両方から呼ばれる、共通の部品
+    // セッションに保存された checked_items（'ingredient_70' のような文字列の配列）から、
+    // 実際の材料名・分量・単位を取得し、レシピIDごとにグループ分けした配列を組み立てる
+    /**
+     * Shared helper used by both confirmShow() and send().
+     * Takes the session's checked_items (strings like "ingredient_70" or
+     * "condiment_12"), resolves each one to its actual name/quantity/unit,
+     * and groups the results by recipe. Factored out to avoid duplicating
+     * this logic in two places and risking the two copies drifting apart.
+     */
+    private function buildDisplayItems(
+        array $checkedItems,
+        RecipeIngredientRepository $recipeIngredientRepository,
+        RecipeCondimentRepository $recipeCondimentRepository
+    ): array {
+        $displayItems = [];
+
+        foreach ($checkedItems as $item) {
+            // $itemが、例えば'ingredient_70'だったとします。explode('_', ...)は、「_という記号の場所で、文字列を切り分けて、その結果を、配列として返す」関数
+            $parts = explode('_', $item);
+
+            // $partsという変数の中に、「切り分けられた、2つの文字列が入った、配列」が、入っています。$parts = ['ingredient', '70'];
+            $type = $parts[0];
+
+            // この分けられた配列の中のIDは1番目の順番にあるところだよと教えている
+            $id = $parts[1];
+
+            if ($type === 'ingredient') {
+                $ri = $recipeIngredientRepository->find($id);
+                if ($ri) {
+                    $recipeId = $ri->getRecipe()->getId();
+                    $recipeName = $ri->getRecipe()->getName();
+
+                    // このレシピIDが、まだ $displayItems に登場していなければ、先に「箱」を作っておく。「からあげ」という引き出し自体が、まだ無ければ
+                    if (!isset($displayItems[$recipeId])) {
+                        // その引き出し自体を、新しく作る（中には、レシピ名と、まだ空っぽの材料リストを入れる）
+                        $displayItems[$recipeId] = [
+                            'recipeName' => $recipeName,
+                            'items' => [],
+                        ];
+                    }
+
+                    // 「からあげ」の引き出しの中の、「材料リスト」という、さらに小さい引き出しに、今処理している1つの材料を、追加する
+                    $displayItems[$recipeId]['items'][] = [
+                        'name' => $ri->getIngredient()->getName(),
+                        'quantity' => $ri->getQuantity(),
+                        'unit' => $ri->getUnit(),
+                    ];
+                }
+            } elseif ($type === 'condiment') {
+                $rc = $recipeCondimentRepository->find($id);
+                if ($rc) {
+                    $recipeId = $rc->getRecipe()->getId();
+                    $recipeName = $rc->getRecipe()->getName();
+
+                    if (!isset($displayItems[$recipeId])) {
+                        $displayItems[$recipeId] = [
+                            'recipeName' => $recipeName,
+                            'items' => [],
+                        ];
+                    }
+
+                    $displayItems[$recipeId]['items'][] = [
+                        'name' => $rc->getCondiment()->getName(),
+                        'quantity' => $rc->getQuantity(),
+                        'unit' => $rc->getUnit(),
+                    ];
+                }
+            }
         }
 
-        return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
+        return $displayItems;
     }
 }

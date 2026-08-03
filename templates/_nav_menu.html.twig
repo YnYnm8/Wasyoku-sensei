@@ -6,7 +6,58 @@
         ☰
     </button>
 
+    <div id="nav-menu-panel"{# templates/_nav_menu.html.twig #}
+<div class="relative z-50">
+    <button type="button"
+            onclick="document.getElementById('nav-menu-panel').classList.toggle('hidden'); this.setAttribute('aria-expanded', document.getElementById('nav-menu-panel').classList.contains('hidden') ? 'false' : 'true')"
+            aria-label="Ouvrir le menu de navigation"
+            aria-expanded="false"
+            aria-controls="nav-menu-panel"
+            class="text-2xl text-washoku-cream hover:text-washoku-red transition">
+        ☰
+    </button>
+
     <div id="nav-menu-panel"
+         class="hidden absolute right-0 top-full mt-3 w-56 bg-washoku-input border border-washoku-beige/20 rounded-xl shadow-lg py-2 z-50">
+
+        <a href="{{ path('app_recipe_index') }}"
+           class="block px-4 py-2 text-sm text-washoku-cream hover:bg-washoku-red/20 hover:text-washoku-red transition whitespace-nowrap">
+            Recettes
+        </a>
+        <a href="{{ path('app_condiment_index') }}"
+           class="block px-4 py-2 text-sm text-washoku-cream hover:bg-washoku-red/20 hover:text-washoku-red transition whitespace-nowrap">
+            Condiments
+        </a>
+
+        {% if app.user %}
+            <a href="{{ path('app_favorite_index') }}"
+               class="block px-4 py-2 text-sm text-washoku-cream hover:bg-washoku-red/20 hover:text-washoku-red transition whitespace-nowrap">
+                Mes favoris
+            </a>
+        {% else %}
+            <a href="{{ path('app_login') }}"
+               class="block px-4 py-2 text-sm text-washoku-cream hover:bg-washoku-red/20 hover:text-washoku-red transition whitespace-nowrap">
+                Se connecter
+            </a>
+        {% endif %}
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="border-t border-washoku-beige/20 my-2"></div>
+            <a href="{{ path('app_recipe_admin_index') }}"
+               class="block px-4 py-2 text-sm text-washoku-cream hover:bg-washoku-red/20 hover:text-washoku-red transition whitespace-nowrap">
+                Admin
+            </a>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="border-t border-washoku-beige/20 my-2"></div>
+            <a href="{{ path('app_logout') }}"
+               class="block px-4 py-2 text-sm text-washoku-red hover:bg-washoku-red/10 transition whitespace-nowrap">
+                Déconnexion
+            </a>
+        {% endif %}
+    </div>
+</div>
          class="hidden absolute right-0 top-full mt-3 w-56 bg-washoku-input border border-washoku-beige/20 rounded-xl shadow-lg py-2 z-50">
 
         <a href="{{ path('app_recipe_index') }}"

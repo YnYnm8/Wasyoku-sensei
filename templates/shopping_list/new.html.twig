@@ -23,7 +23,7 @@
                     {% if photo %}
                         <img src="{{ photo.url }}" alt="{{ recipe.name }}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
                     {% endif %}
-                    <h3 class="font-display text-lg">{{ recipe.name }}</h3>
+                    <h2 class="font-display text-lg">{{ recipe.name }}</h2>
                 </div>
 
                 {# US6.1 CA2：人数はお気に入り登録時の値が初期値。この画面でも+/-ボタンで変更できる
@@ -36,7 +36,7 @@
                 </div>
 
                 {# US6.1 CA3・CA4：材料は、レシピをまたいで合算せず、レシピごとに分けて表示する #}
-                <h4 class="text-sm text-gray-500 mt-4">材料</h4>
+                <h3 class="text-sm text-gray-500 mt-4">材料</h3>
                 <ul>
                     {% for ri in recipe.recipeIngredients %}
                         {# data-base-quantity・data-recipe-id は、後でJSが「どの材料を、どのレシピの人数で」
@@ -51,7 +51,7 @@
                     {% endfor %}
                 </ul>
 
-                <h4 class="text-sm text-gray-500 mt-4">調味料</h4>
+                <h3 class="text-sm text-gray-500 mt-4">調味料</h3>
                 <ul>
                     {% for rc in recipe.recipeCondiments %}
                         <li data-base-quantity="{{ rc.quantity }}" data-recipe-id="{{ recipe.id }}" class="py-2 border-b border-washoku-beige">

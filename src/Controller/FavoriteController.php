@@ -10,9 +10,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Recipe;
 use App\Entity\Favorite;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 
 #[Route('/favorite')]
+#[IsGranted('ROLE_USER')]
 final class FavoriteController extends AbstractController
 {
     #[Route('', name: 'app_favorite_index', methods: ['GET'])]

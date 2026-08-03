@@ -16,9 +16,9 @@
 
 	<div class="p-6 space-y-8">
 		{% if app.user %}
-			<h1 class="font-display text-2xl text-washoku-red">ようこそ！{{ app.user.username }}さん</h1>
+			<h2 class="font-display text-2xl text-washoku-red">ようこそ！{{ app.user.username }}さん</h2>
 		{% else %}
-			<h1 class="font-display text-2xl text-washoku-red">ようこそ！</h1>
+			<h2 class="font-display text-2xl text-washoku-red">ようこそ！</h2>
 		{% endif %}
 
 		{# 食材で探す #}
@@ -118,7 +118,7 @@
 			<h2 class="font-display text-xl">人気のレシピ</h2>
 			<span class="w-4 h-4 bg-washoku-red "></span>
 		</div>
-		<p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Recettes populaires</p>
+		<p class="text-xs text-gray-600 uppercase tracking-widest mt-1">Recettes populaires</p>
 	</div>
 	<div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
 		{% for recipe in recipes %}

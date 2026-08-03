@@ -27,8 +27,10 @@
         <p class="font-display text-white text-lg font-semibold">Connexion</p>
         <p class="text-washoku-inputtext text-xs mb-4">ログイン</p>
 
+        <label for="inputEmail" class="sr-only">Adresse e-mail</label>
         <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext" placeholder="Email" autocomplete="email" required autofocus>
 
+        <label for="inputPassword" class="sr-only">Mot de passe</label>
         <input type="password" name="password" id="inputPassword" class="w-full bg-washoku-input border border-washoku-beige/30 rounded-lg px-3 py-2 text-white placeholder-washoku-inputtext mt-3" placeholder="Mot de passe" autocomplete="current-password" required>
 
         <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">

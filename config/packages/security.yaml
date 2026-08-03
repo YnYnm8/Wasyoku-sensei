@@ -49,6 +49,8 @@ security:
         - { path: ^/condiment/new, roles: ROLE_ADMIN }
         - { path: ^/condiment/\d+/edit, roles: ROLE_ADMIN }
         - { path: ^/condiment/\d+/substitute, roles: ROLE_ADMIN }
+        - { path: ^/favorite, roles: ROLE_USER }
+        - { path: ^/shopping-list, roles: ROLE_USER }
        
 when@test:
     security:

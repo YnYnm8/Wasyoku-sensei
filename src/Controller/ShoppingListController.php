@@ -19,6 +19,11 @@ final class ShoppingListController extends AbstractController
 {
     // ① favorite/index.html.twig の「Créer la liste de courses」から呼ばれる
     // 選んだレシピIDだけを、セッションに保存する
+    /**
+     * Step 1: called from the "Créer la liste de courses" button on the
+     * favorites page. Stores the selected recipe IDs in the session only
+     * (no database write yet).
+     */
     #[Route('/shopping-list/create', name: 'app_shopping_list_create', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function create(Request $request, SessionInterface $session): Response
@@ -33,6 +38,11 @@ final class ShoppingListController extends AbstractController
 
     // ② shopping_list/new.html.twig の「Valider ma liste」から呼ばれる
     // チェック内容・メモを、セッションに保存する
+    /**
+     * Step 2: called from the "Valider ma liste" button. Stores the checked
+     * items and the free-text memo in the session, then redirects to the
+     * confirmation screen (Post/Redirect/Get pattern).
+     */
     #[Route('/shopping-list/confirm', name: 'app_shopping_list_confirm', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function confirm(Request $request, SessionInterface $session): Response
@@ -53,6 +63,11 @@ final class ShoppingListController extends AbstractController
     // ③ セッションから、チェック内容・メモを取り出して、確認画面（Image 2相当）を表示する
     // US6.2 CA1：材料・調味料を、レシピごとにグループ分けして表示するため、
     // buildDisplayItems() という共通部品（下にあります）を使って、組み立てる
+    /**
+     * Step 3: reads the checked items and memo back from the session and
+     * displays the confirmation screen, grouped by recipe via
+     * buildDisplayItems() (US6.2 CA1).
+     */
     #[Route('/shopping-list/confirm', name: 'app_shopping_list_confirm_show', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function confirmShow(
@@ -78,6 +93,11 @@ final class ShoppingListController extends AbstractController
     }
 
     // ④ favorite/index.html.twig から選んだレシピの一覧を、人数調整UI付きで表示する画面
+    /**
+     * Display the recipes selected from the favorites page, with the
+     * person-count adjustment UI. Fetches Favorite records (not just
+     * Recipe) so the saved person count is available too.
+     */
     #[Route('/shopping-list/new', name: 'app_shopping_list_new', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function new(
@@ -108,6 +128,13 @@ final class ShoppingListController extends AbstractController
     // ⑤ 「Envoyer」ボタンから呼ばれる、メール送信アクション
     // US6.2 CA3：入力されたメールアドレスへ、材料・調味料の一覧を、メールで送信する
     // US6.2 CA2：「Inclure la recette」がチェックされているレシピは、作り方も本文に含める
+    /**
+     * Final step: sends the shopping list by e-mail (US6.2 CA3), to either
+     * the account's own address or a free-text address. Recipes checked as
+     * "Inclure la recette" also get their preparation steps in the body
+     * (US6.2 CA2). Nothing is persisted to the database; the e-mail itself
+     * acts as the history.
+     */
     #[Route('/shopping-list/send', name: 'app_shopping_list_send', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function send(
@@ -170,6 +197,13 @@ final class ShoppingListController extends AbstractController
     // confirmShow() と send() の、両方から呼ばれる、共通の部品
     // セッションに保存された checked_items（'ingredient_70' のような文字列の配列）から、
     // 実際の材料名・分量・単位を取得し、レシピIDごとにグループ分けした配列を組み立てる
+    /**
+     * Shared helper used by both confirmShow() and send().
+     * Takes the session's checked_items (strings like "ingredient_70" or
+     * "condiment_12"), resolves each one to its actual name/quantity/unit,
+     * and groups the results by recipe. Factored out to avoid duplicating
+     * this logic in two places and risking the two copies drifting apart.
+     */
     private function buildDisplayItems(
         array $checkedItems,
         RecipeIngredientRepository $recipeIngredientRepository,
