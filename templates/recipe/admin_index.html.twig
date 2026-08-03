@@ -10,9 +10,12 @@
 
 {% block admin_body %}
 
-    <div class="mb-6">
-        <a href="{{ path('app_recipe_new') }}" class="btn-primary max-w-sm lg:max-w-xs inline-block text-center">
-            + 新しいレシピを追加・Ajouter une nouvelle recette
+ <div class="mb-6">
+        <a href="{{ path('app_recipe_new') }}"
+           class="inline-flex items-center gap-2 bg-washoku-red hover:bg-washoku-redhover text-white font-semibold rounded-lg px-12 py-3 text-base transition">
+            <span class="text-xl leading-none">+</span> 
+            新しいレシピを追加<br>Ajouter une nouvelle recette
+
         </a>
     </div>
 

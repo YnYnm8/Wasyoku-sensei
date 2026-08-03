@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Trouver une épicerie asiatique{% endblock %}
+
+{% block body %}
+
+<div class="p-6 space-y-6">
+
+    <div>
+        <h1 class="font-display text-2xl">和食材を探す</h1>
+        <p class="text-sm text-gray-500">TROUVER UNE ÉPICERIE ASIATIQUE</p>
+    </div>
+
+    <form method="get" action="{{ path('app_asian_shop_index') }}" class="flex gap-2">
+        <input type="text"
+               name="postcode"
+               value="{{ postcode }}"
+               placeholder="Rechercher par code postal (ex : 31000)"
+               class="flex-1 border border-washoku-beige rounded-lg px-3 py-2">
+        <button type="submit" class="btn-primary !w-auto px-6">Rechercher</button>
+        {% if postcode %}
+            <a href="{{ path('app_asian_shop_index') }}" class="btn-secondary !w-auto px-6 flex items-center">
+                Réinitialiser
+            </a>
+        {% endif %}
+    </form>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for shop in shops %}
+            <div class="card-popup max-w-none">
+                <h3 class="font-display text-lg text-gray-800">{{ shop.name }}</h3>
+                <p class="text-sm text-gray-600 mt-1">{{ shop.address }} ({{ shop.postcode }})</p>
+                <p class="text-sm text-gray-600">📞 {{ shop.telephone }}</p>
+                {% if shop.explanationService %}
+                    <p class="text-sm text-gray-500 mt-2">{{ shop.explanationService }}</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="text-gray-500">
+                {% if postcode %}
+                    Aucun magasin ne correspond au code postal « {{ postcode }} ».
+                {% else %}
+                    Aucun magasin n'est encore enregistré.
+                {% endif %}
+            </p>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

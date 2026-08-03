@@ -6,9 +6,6 @@ use App\Entity\AsianShop;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<AsianShop>
- */
 class AsianShopRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +13,18 @@ class AsianShopRepository extends ServiceEntityRepository
         parent::__construct($registry, AsianShop::class);
     }
 
-    //    /**
-    //     * @return AsianShop[] Returns an array of AsianShop objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?AsianShop
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * 郵便番号の前方一致で店舗を検索する（例：'310'と入力すると31000〜31999にマッチ）
+     *
+     * @return AsianShop[]
+     */
+    public function findByPostcodePrefix(string $postcodePrefix): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.postcode LIKE :prefix')
+            ->setParameter('prefix', $postcodePrefix . '%')
+            ->orderBy('a.postcode', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

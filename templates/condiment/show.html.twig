@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ condiment.name }}{% endblock %}
+{% block title %}
+{{ condiment.name }}
+{% endblock %}
 
 {% block body %}
 
@@ -40,7 +42,11 @@
             {% for group in condiment.condimentSubstituteGroups %}
                 <p class="text-lg font-semibold mt-1">
                     {% for substitute in group.condimentSubstitutes %}
-                        {{ substitute.name }} {{ substitute.quantity }}{{ substitute.unit }}{% if not loop.last %} + {% endif %}
+                        {{ substitute.name }}
+                        {{ substitute.quantity }}{{ substitute.unit }}
+                        {% if not loop.last %}
+                            +
+                        {% endif %}
                     {% endfor %}
                 </p>
             {% endfor %}
@@ -61,7 +67,12 @@
         {% endif %}
     </div>
 
-    <a href="{{ path('app_condiment_index') }}" class="block mt-6 text-gray-500">back to list</a>
+    <div class="mt-6">
+        <p class="text-sm text-gray-500">MAGASIN PRÈS DE CHEZ VOUS 近くのお店</p>
+        <a href="{{ path('app_asian_shop_index') }}" class="btn-secondary mt-2 inline-block !w-auto px-6">
+            Chercher un magasin
+        </a>
+    </div>
 
     {% if is_granted('ROLE_ADMIN') %}
         <a href="{{ path('app_condiment_edit', {'id': condiment.id}) }}" class="btn-secondary mt-2 inline-block !w-auto px-6">Éditer</a>
