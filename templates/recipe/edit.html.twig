@@ -133,7 +133,7 @@
         <ul class="space-y-3">
             {% for media in recipe.media|filter(m => m.stepOrder is null) %}
                 <li class="flex items-center gap-3 bg-washoku-beige/40 rounded-lg px-3 py-2">
-                    <img src="{{ media.url }}" alt="{{ media.name }}" class="w-16 h-16 object-cover rounded-md">
+                    <img src="{{ media.url }}" alt="{{ media.name }}" loading="lazy" class="w-16 h-16 object-cover rounded-md">
                     <form method="post" action="{{ path('app_recipe_media_delete', {id: recipe.id, mediaId: media.id}) }}" style="display:inline">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete_media' ~ media.id) }}">
                         <button type="submit" onclick="return confirm('Retirer cette photo ?')" class="text-washoku-red hover:text-washoku-redhover text-sm font-semibold">削除</button>
@@ -172,7 +172,7 @@
             {% for media in recipe.media|filter(m => m.stepOrder is not null)|sort((a, b) => a.stepOrder <=> b.stepOrder) %}
                 <li class="flex items-start gap-3 bg-washoku-beige/40 rounded-lg px-3 py-2">
                     <span class="font-display text-washoku-red text-lg w-8">{{ '%02d'|format(loop.index) }}</span>
-                    <img src="{{ media.url }}" alt="" class="w-16 h-16 object-cover rounded-md">
+                    <img src="{{ media.url }}" alt="" loading="lazy" class="w-16 h-16 object-cover rounded-md">
                     <p class="text-sm text-gray-700 flex-1">{{ media.stepDescription }}</p>
                     <form method="post" action="{{ path('app_recipe_media_delete', {id: recipe.id, mediaId: media.id}) }}" style="display:inline">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete_media' ~ media.id) }}">

@@ -20,7 +20,7 @@
     {% if condiment.imageUrl %}
         <div class="card-popup max-w-sm lg:max-w-4xl mb-8">
             <h2 class="font-display text-lg mb-4">現在の写真・Photo actuelle</h2>
-            <img src="{{ condiment.imageUrl }}" alt="{{ condiment.name }}" class="w-full max-w-xs rounded-lg object-cover">
+            <img src="{{ condiment.imageUrl }}" alt="{{ condiment.name }}" loading="lazy" class="w-full max-w-xs rounded-lg object-cover">
         </div>
     {% endif %}
 

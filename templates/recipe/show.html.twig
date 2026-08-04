@@ -95,7 +95,7 @@
 			{% for media in recipe.media|filter(m => m.stepOrder is not null)|sort((a, b) => a.stepOrder <=> b.stepOrder) %}
 				<div class="flex items-center gap-4 border-b border-washoku-beige pb-4">
 					<span class="text-washoku-red font-display text-2xl w-8">{{ '%02d'|format(media.stepOrder) }}</span>
-					<img src="{{ media.url }}" alt="{{ media.stepDescription }}" class="w-36 h- object-cover rounded-lg flex-shrink-0">
+					<img src="{{ media.url }}" alt="{{ media.stepDescription }}" loading="lazy" class="w-36 h- object-cover rounded-lg flex-shrink-0">
 					<div>
 						<p class="font-semibold">{{ media.stepDescription }}</p>
 					</div>

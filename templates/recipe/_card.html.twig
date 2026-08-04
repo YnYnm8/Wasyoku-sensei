@@ -1,7 +1,7 @@
 <div class="card-popup !max-w-none !mx-0 !p-0 overflow-hidden flex flex-col relative">
 	{% set photo = recipe.media|first %}
 	{% if photo %}
-		<img src="{{ photo.url }}" alt="{{ recipe.name }}" class="w-full h-48 object-cover">
+		<img src="{{ photo.url }}" alt="{{ recipe.name }}" loading="lazy" class="w-full h-48 object-cover">
 	{% endif %}
 
 	<div class="p-4 flex flex-col gap-2">

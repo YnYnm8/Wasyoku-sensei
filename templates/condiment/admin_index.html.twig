@@ -24,7 +24,7 @@
 
                 <div class="w-20 h-20 lg:w-full lg:h-40 rounded-lg overflow-hidden bg-washoku-beige flex-shrink-0">
                     {% if condiment.imageUrl %}
-                        <img src="{{ condiment.imageUrl }}" alt="{{ condiment.name }}" class="w-full h-full object-cover">
+                        <img src="{{ condiment.imageUrl }}" alt="{{ condiment.name }}" loading="lazy" class="w-full h-full object-cover">
                     {% endif %}
                 </div>
 

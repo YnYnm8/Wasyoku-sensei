@@ -23,7 +23,7 @@
                 {% set photo = recipe.media|first %}
                 <div class="flex items-center gap-3">
                     {% if photo %}
-                        <img src="{{ photo.url }}" alt="{{ recipe.name }}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+                        <img src="{{ photo.url }}" alt="{{ recipe.name }}" loading="lazy" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
                     {% endif %}
                     <h2 class="font-display text-lg">{{ recipe.name }}</h2>
                 </div>

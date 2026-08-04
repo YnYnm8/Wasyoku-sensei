@@ -26,7 +26,7 @@
                 {% set mainPhoto = recipe.media|filter(m => m.stepOrder is null)|first %}
                 <div class="w-20 h-20 lg:w-full lg:h-40 rounded-lg overflow-hidden bg-washoku-beige flex-shrink-0">
                     {% if mainPhoto %}
-                        <img src="{{ mainPhoto.url }}" alt="{{ recipe.name }}" class="w-full h-full object-cover">
+                        <img src="{{ mainPhoto.url }}" alt="{{ recipe.name }}" loading="lazy" class="w-full h-full object-cover">
                     {% endif %}
                 </div>
 
