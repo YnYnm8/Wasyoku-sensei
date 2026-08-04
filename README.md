@@ -52,6 +52,20 @@ docker compose -f compose.yaml up -d --build
 docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
+### 6. バックアップ・復元 / Sauvegarde et restauration
+`scripts/backup-db.sh` と `scripts/restore-db.sh` を使うと、コンテナ内の MySQL データベースを `mysqldump` でバックアップ・復元できる（`compose.yaml` の `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DATABASE` を使用、未設定時はデフォルト値 `app` / `!ChangeMe!` を使用）。
+Les scripts `scripts/backup-db.sh` et `scripts/restore-db.sh` permettent de sauvegarder/restaurer la base de données MySQL du conteneur via `mysqldump` (utilisent `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DATABASE` définis dans `compose.yaml`, ou leurs valeurs par défaut `app` / `!ChangeMe!`).
+
+**バックアップ / Sauvegarde**（`backups/` フォルダに `backup_YYYYMMDD_HHMMSS.sql` を作成、このフォルダはGit管理対象外 / crée `backups/backup_YYYYMMDD_HHMMSS.sql`, dossier non versionné） :
+```bash
+./scripts/backup-db.sh
+```
+
+**復元 / Restauration**（既存データを上書きするため、実行前に確認を求められる / écrase les données existantes, une confirmation est demandée avant l'exécution） :
+```bash
+./scripts/restore-db.sh backups/backup_YYYYMMDD_HHMMSS.sql
+```
+
 ### 補足 / Notes
 - MySQLのデータは名前付きボリューム `database_data` に永続化されるため、コンテナを再起動してもデータは消えない。
   Les données MySQL sont persistées dans le volume nommé `database_data` : elles ne sont pas perdues lors du redémarrage des conteneurs.
