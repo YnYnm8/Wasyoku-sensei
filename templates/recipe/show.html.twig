@@ -1,7 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	{{ recipe.name }}
+	{{ recipe.name }} — Wasyoku Sensei
 {% endblock %}
+
+{% block meta_description %}{{ recipe.description|striptags|slice(0, 155) }}{% endblock %}
 {% block body %}
 	<div>
 		{% set mainPhoto = recipe.media|filter(m => m.stepOrder is null)|first %}

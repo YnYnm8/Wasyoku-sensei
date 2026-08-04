@@ -1,8 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-{{ condiment.name }}
+{{ condiment.name }} — Wasyoku Sensei
 {% endblock %}
+
+{% block meta_description %}{{ condiment.explanation|striptags|slice(0, 155) }}{% endblock %}
 
 {% block body %}
 

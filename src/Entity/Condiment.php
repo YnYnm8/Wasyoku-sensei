@@ -24,7 +24,7 @@ class Condiment
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $composition = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: '`use`', length: 255)]
     private ?string $use = null;
 
     #[ORM\Column(length: 255, nullable: true)]
