@@ -76,12 +76,6 @@
         </a>
     </div>
 
-    {% if is_granted('ROLE_ADMIN') %}
-        <a href="{{ path('app_condiment_edit', {'id': condiment.id}) }}" class="btn-secondary mt-2 inline-block !w-auto px-6">Éditer</a>
-    {% endif %}
-
-    {% if is_granted('ROLE_ADMIN') %}
-        {{ include('condiment/_delete_form.html.twig') }}
-    {% endif %}
+   
 </div>
 {% endblock %}

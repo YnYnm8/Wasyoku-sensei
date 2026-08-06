@@ -2,7 +2,8 @@
 {% block title %}Toutes les recettes
 {% endblock %}
 
-{% block meta_description %}Parcourez toutes les recettes washoku de Wasyoku Sensei, filtrables par ingrédient et niveau de difficulté.{% endblock %}
+{% block meta_description %}Parcourez toutes les recettes washoku de Wasyoku Sensei, filtrables par ingrédient et niveau de difficulté.
+{% endblock %}
 {% block body %}
 
 	<div class="px-6 pb-6">
@@ -36,11 +37,11 @@
 		{% for i in 1..totalPages %}
 			{# 1..totalPagesは、配列ではなく、「1から、totalPagesまでの数字を、その場で新しく作ってください」という指示です。 #}
 			<a href="{{ path('app_recipe_index', {'page': i}) }}" class="w-10 h-10 flex items-center justify-center rounded-xl font-semibold transition
-					                  {% if i == currentPage %}
-					                      bg-washoku-red text-white
-					                  {% else %}
-					                      bg-white border border-washoku-beige text-gray-700 hover:bg-washoku-cream
-					                  {% endif %}">
+										                  {% if i == currentPage %}
+										                      bg-washoku-red text-white
+										                  {% else %}
+										                      bg-white border border-washoku-beige text-gray-700 hover:bg-washoku-cream
+										                  {% endif %}">
 				{{ i }}
 			</a>
 		{% endfor %}
@@ -52,10 +53,6 @@
 		{% endif %}
 	</div>
 
-	{% if is_granted('ROLE_ADMIN') %}
-		<a href="{{ path('app_recipe_new') }}" class="btn-primary">
-			+ Ajouter une nouvelle recette
-		</a>
-	{% endif %}
+	
 
 {% endblock %}

@@ -1,9 +1,12 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	{{ recipe.name }} — Wasyoku Sensei
+	{{ recipe.name }}
+	— Wasyoku Sensei
 {% endblock %}
 
-{% block meta_description %}{{ recipe.description|striptags|slice(0, 155) }}{% endblock %}
+{% block meta_description %}
+	{{ recipe.description|striptags|slice(0, 155) }}
+{% endblock %}
 {% block body %}
 	<div>
 		{% set mainPhoto = recipe.media|filter(m => m.stepOrder is null)|first %}
@@ -63,7 +66,8 @@
 						{% if rc.condiment.condimentSubstituteGroups|length > 0 %}
 							<dialog id="dialog-{{ rc.condiment.id }}" class="card-popup">
 								<div class="popup-icon-circle">🍶</div>
-								<p class="popup-title">Pas de {{ rc.condiment.name }}？</p>
+								<p class="popup-title">Pas de
+									{{ rc.condiment.name }}？</p>
 								<p class="popup-subtitle">SUBSTITUTION -
 									{{ rc.condiment.name }}</p>
 
@@ -120,13 +124,5 @@
 		{% endif %}
 	{% endif %}
 
-	{% if is_granted('ROLE_ADMIN') %}
-		<a href="{{ path('app_recipe_edit', {id: recipe.id}) }}" class="btn-primary">Éditer</a>
-	{% endif %}
-
-
-	{% if is_granted('ROLE_ADMIN') %}
-		{{ include('recipe/_delete_form.html.twig') }}
-	{% endif %}
 
 {% endblock %}
