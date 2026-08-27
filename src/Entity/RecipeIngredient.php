@@ -5,6 +5,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Ingredient;
 
 #[ORM\Entity(repositoryClass: RecipeIngredientRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_recipe_ingredient', columns: ['recipe_id', 'ingredient_id'])]
 class RecipeIngredient
 {
     #[ORM\Id]

@@ -247,7 +247,8 @@ final class RecipeController extends AbstractController
         Request $request,
         Recipe $recipe,
         EntityManagerInterface $entityManager,
-        IngredientRepository $ingredientRepository
+        IngredientRepository $ingredientRepository,
+        RecipeIngredientRepository $recipeIngredientRepository
     ): Response {
         // フォームから送信された値を受け取る。trim()で前後の余計な空白を除去
         $name = trim($request->request->get('ingredient_name', ''));
@@ -267,6 +268,17 @@ final class RecipeController extends AbstractController
             $ingredient = new Ingredient();
             $ingredient->setName($name);
             $entityManager->persist($ingredient);
+        } else {
+            // 既存の材料の場合のみ、同じレシピに既に登録されていないか確認する
+            $existingRecipeIngredient = $recipeIngredientRepository->findOneBy([
+                'recipe' => $recipe,
+                'ingredient' => $ingredient,
+            ]);
+
+            if ($existingRecipeIngredient) {
+                $this->addFlash('error', 'Cet ingrédient est déjà dans la recette.');
+                return $this->redirectToRoute('app_recipe_edit', ['id' => $recipe->getId()], Response::HTTP_SEE_OTHER);
+            }
         }
 
         // レシピと材料を、分量・単位付きで結びつける中間テーブルのレコードを作成
