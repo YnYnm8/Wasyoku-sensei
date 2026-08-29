@@ -15,12 +15,18 @@ class UserFixtures extends Fixture
     public const USER_JOHN_REFERENCE = 'user-john';
     public const USER_LUZ_REFERENCE = 'user-luz';
 
+    /**
+     * @param UserPasswordHasherInterface $passwordHasher Used to hash the demo users' plaintext passwords.
+     */
     public function __construct(
-        
+
         private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
+    /**
+     * Loads the demo admin and regular-user accounts, each with a hashed password.
+     */
     public function load(ObjectManager $manager): void
     {
         // --- 管理者ユーザー ---

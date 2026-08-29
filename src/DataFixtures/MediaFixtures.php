@@ -10,6 +10,9 @@ use Doctrine\Persistence\ObjectManager;
 
 class MediaFixtures extends Fixture implements DependentFixtureInterface
 {
+    /**
+     * Loads each recipe's main photo plus its ordered preparation-step photos.
+     */
     public function load(ObjectManager $manager): void
     {
         $karaage = $this->getReference('recipe-karaage', Recipe::class);
@@ -202,6 +205,10 @@ class MediaFixtures extends Fixture implements DependentFixtureInterface
         $manager->flush();
     }
 
+    /**
+     * Declares that AppFixtures must run first, so the recipe references it
+     * sets exist before this fixture looks them up.
+     */
     public function getDependencies(): array
     {
         return [

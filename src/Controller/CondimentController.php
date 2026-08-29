@@ -19,6 +19,9 @@ use App\Repository\CondimentSubstituteGroupRepository;
 #[Route('/condiment')]
 final class CondimentController extends AbstractController
 {
+    /**
+     * Lists condiments with pagination for visitors.
+     */
     #[Route(name: 'app_condiment_index', methods: ['GET'])]
     public function index(CondimentRepository $condimentRepository, Request $request): Response
     {
@@ -40,6 +43,9 @@ final class CondimentController extends AbstractController
     }
 
 
+    /**
+     * Creates a new condiment (admin only).
+     */
     #[Route('/new', name: 'app_condiment_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -62,6 +68,9 @@ final class CondimentController extends AbstractController
     }
     
     // US3.x：管理者専用の調味料一覧（訪問者向けのindex()とは別に用意）
+    /**
+     * Lists all condiments for the admin back-office (no pagination).
+     */
     #[Route('/admin', name: 'app_condiment_admin_index', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN')]
     public function adminIndex(CondimentRepository $condimentRepository): Response
@@ -73,6 +82,9 @@ final class CondimentController extends AbstractController
         ]);
     }
 
+    /**
+     * Shows the detail page of a single condiment.
+     */
     #[Route('/{id}', name: 'app_condiment_show', methods: ['GET'])]
     public function show(Condiment $condiment): Response
     {
@@ -81,6 +93,9 @@ final class CondimentController extends AbstractController
         ]);
     }
 
+    /**
+     * Edits an existing condiment (admin only).
+     */
     #[Route('/{id}/edit', name: 'app_condiment_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Condiment $condiment, EntityManagerInterface $entityManager): Response
@@ -100,6 +115,9 @@ final class CondimentController extends AbstractController
         ]);
     }
 
+    /**
+     * Deletes a condiment after CSRF token validation (admin only).
+     */
     #[Route('/{id}', name: 'app_condiment_delete', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Condiment $condiment, EntityManagerInterface $entityManager): Response
@@ -116,6 +134,9 @@ final class CondimentController extends AbstractController
     // レシピ編集ページの<dialog>フォームから送信される、代替品の追加処理
     // 材料（Ingredient）と違い、代替品は「グループ」→「個々の代替品」という2階層の構造を持つため、
 
+    /**
+     * Adds a substitute for a condiment, creating its substitute group on the fly if needed (admin only).
+     */
     #[Route('/{id}/substitute/add', name: 'app_condiment_substitute_add', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function addSubstitute(
@@ -168,6 +189,9 @@ final class CondimentController extends AbstractController
 
         return $this->redirectToRoute('app_condiment_edit', ['id' => $condiment->getId()], Response::HTTP_SEE_OTHER);
     }
+    /**
+     * Deletes a substitute, and removes its parent group too if it becomes empty (admin only).
+     */
     #[Route('/{id}/substitute/{substituteId}/delete', name: 'app_condiment_substitute_delete', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function deleteSubstitute(

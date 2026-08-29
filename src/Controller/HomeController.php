@@ -8,6 +8,9 @@ use App\Repository\FavoriteRepository;
 
 final class HomeController extends AbstractController
 {
+    /**
+     * Renders the home page with the most popular recipes and the current user's favorite recipe ids.
+     */
     #[Route('/', name: 'app_home')]
   public function index(RecipeRepository $recipeRepository, FavoriteRepository $favoriteRepository): Response
 {

@@ -30,16 +30,25 @@ class Favorite
     private ?int $person = 1;
 
     // これは「カラムの代わり」ではなく、「カラムに自動で値を入れてくれる仕組み」です。
+    /**
+     * Stamps savedAt with the current time as soon as the favorite is created.
+     */
     public function __construct()
     {
         $this->savedAt = new \DateTimeImmutable();
     }
 
+    /**
+     * Returns the favorite's id.
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * Sets the favorite's id.
+     */
     public function setId(int $id): static
     {
         $this->id = $id;
@@ -47,11 +56,17 @@ class Favorite
         return $this;
     }
 
+    /**
+     * Returns the favorited recipe.
+     */
     public function getRecipe(): ?Recipe
     {
         return $this->recipe;
     }
 
+    /**
+     * Sets the favorited recipe.
+     */
     public function setRecipe(?Recipe $recipe): static
     {
         $this->recipe = $recipe;
@@ -59,22 +74,34 @@ class Favorite
         return $this;
     }
 
+    /**
+     * Returns when the favorite was saved.
+     */
     public function getSavedAt(): ?\DateTimeImmutable
     {
         return $this->savedAt;
     }
 
+    /**
+     * Sets when the favorite was saved.
+     */
     public function setSavedAt(\DateTimeImmutable $savedAt): static
     {
         $this->savedAt = $savedAt;
         return $this;
     }
 
+    /**
+     * Returns the user who favorited the recipe.
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
+    /**
+     * Sets the user who favorited the recipe.
+     */
     public function setUser(?User $user): static
     {
         $this->user = $user;
@@ -82,11 +109,17 @@ class Favorite
         return $this;
     }
 
+    /**
+     * Returns the person count chosen for this favorite (used to scale quantities).
+     */
     public function getPerson(): ?int
     {
         return $this->person;
     }
 
+    /**
+     * Sets the person count chosen for this favorite (used to scale quantities).
+     */
     public function setPerson(?int $person): static
     {
         $this->person = $person;

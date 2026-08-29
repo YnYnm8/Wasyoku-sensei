@@ -17,6 +17,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class FavoriteController extends AbstractController
 {
+    /**
+     * Lists the current user's favorite recipes.
+     */
     #[Route('', name: 'app_favorite_index', methods: ['GET'])]
     public function index(FavoriteRepository $favoriteRepository): Response
     {
@@ -30,6 +33,9 @@ final class FavoriteController extends AbstractController
 
 
 
+    /**
+     * Adds a recipe to the current user's favorites, guarding against duplicates via CSRF check.
+     */
     #[Route('/{id}/add', name: 'app_favorite_add', methods: ['POST'])]
     public function addFavorite(
         Recipe $recipe,
@@ -72,6 +78,9 @@ final class FavoriteController extends AbstractController
     }
 
 
+    /**
+     * Removes a recipe from the current user's favorites after CSRF token validation.
+     */
     #[Route('/{id}/remove', name: 'app_favorite_remove', methods: ['POST'])]
     public function removeFavorite(
         Recipe $recipe,

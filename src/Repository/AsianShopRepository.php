@@ -8,12 +8,17 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class AsianShopRepository extends ServiceEntityRepository
 {
+    /**
+     * Registers this repository for the AsianShop entity.
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AsianShop::class);
     }
 
     /**
+     * Finds shops whose postcode starts with the given prefix (e.g. '310' matches 31000-31999).
+     *
      * 郵便番号の前方一致で店舗を検索する（例：'310'と入力すると31000〜31999にマッチ）
      *
      * @return AsianShop[]

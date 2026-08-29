@@ -11,12 +11,17 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class RecipeRepository extends ServiceEntityRepository
 {
+    /**
+     * Registers this repository for the Recipe entity.
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Recipe::class);
     }
 
     /**
+     * Finds recipes that contain every one of the given ingredient names (AND search).
+     *
      * 複数の材料名を受け取り、そのすべてを含むレシピだけを検索する（AND検索）
      *
      * @param array $ingredientNames 検索したい材料名の配列（例: ['poulet', 'oignon']）
@@ -53,6 +58,9 @@ class RecipeRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns recipes ordered by favorite count, most-favorited first. Used
+     * for the "popular recipes" section on the home page.
+     *
      * お気に入りの登録数が多い順に、レシピを取得する
      * ホームページの「人気のレシピ」に使用する
      *

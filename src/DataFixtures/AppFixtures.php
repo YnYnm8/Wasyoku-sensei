@@ -15,6 +15,10 @@ use App\Entity\RecipeCondiment;
 
 class AppFixtures extends Fixture
 {
+    /**
+     * Loads the demo data set: ingredients, condiments, recipes, and the
+     * join-table rows (RecipeIngredient/RecipeCondiment) linking them.
+     */
     public function load(ObjectManager $manager): void
     {
         $poulet = new Ingredient();

@@ -11,6 +11,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/asian-shop')]
 final class AsianShopController extends AbstractController
 {
+    /**
+     * Lists Asian grocery shops, optionally filtered by postcode prefix.
+     */
     #[Route(name: 'app_asian_shop_index', methods: ['GET'])]
     public function index(Request $request, AsianShopRepository $asianShopRepository): Response
     {

@@ -38,7 +38,7 @@
                 </div>
 
                 {# US6.1 CA3・CA4：材料は、レシピをまたいで合算せず、レシピごとに分けて表示する #}
-                <h3 class="text-sm text-gray-500 mt-4">材料</h3>
+                <h3 class="text-sm text-gray-500 mt-4">Ingrédients - 材料</h3>
                 <ul>
                     {% for ri in recipe.recipeIngredients %}
                         {# data-base-quantity・data-recipe-id は、後でJSが「どの材料を、どのレシピの人数で」
@@ -53,7 +53,7 @@
                     {% endfor %}
                 </ul>
 
-                <h3 class="text-sm text-gray-500 mt-4">調味料</h3>
+                <h3 class="text-sm text-gray-500 mt-4">Condiments - 調味料</h3>
                 <ul>
                     {% for rc in recipe.recipeCondiments %}
                         <li data-base-quantity="{{ rc.quantity }}" data-recipe-id="{{ recipe.id }}" class="py-2 border-b border-washoku-beige">
